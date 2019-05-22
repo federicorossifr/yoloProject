@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-cli-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-core-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-launchers-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-rest-client-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-rest-high-level-client-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-secure-sm-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/elasticsearch-x-content-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/HdrHistogram-2.1.9.jar"/>
+	<classpathentry kind="lib" path="lib/hppc-0.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/httpasyncclient-4.1.4.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.11.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-nio-4.4.11.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.8.11.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-dataformat-cbor-2.8.11.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-dataformat-smile-2.8.11.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-dataformat-yaml-2.8.11.jar"/>
+	<classpathentry kind="lib" path="lib/java-version-checker-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/javacpp.jar"/>
+	<classpathentry kind="lib" path="lib/javacv.jar"/>
+	<classpathentry kind="lib" path="lib/jna-4.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/joda-time-2.10.1.jar"/>
+	<classpathentry kind="lib" path="lib/jopt-simple-5.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jts-core-1.15.0.jar"/>
+	<classpathentry kind="lib" path="lib/lang-mustache-client-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2-api-2.11.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.11.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.11.1.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-common-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-backward-codecs-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-grouping-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-highlighter-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-join-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-memory-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-misc-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-queries-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-queryparser-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-sandbox-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-spatial-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-spatial-extras-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-spatial3d-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-suggest-7.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-linux-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-linux-x86.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-macosx-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-windows-x86.jar"/>
+	<classpathentry kind="lib" path="lib/opencv.jar"/>
+	<classpathentry kind="lib" path="lib/plugin-classloader-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/rank-eval-client-6.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/snakeyaml-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/spatial4j-0.7.jar"/>
+	<classpathentry kind="lib" path="lib/t-digest-3.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
