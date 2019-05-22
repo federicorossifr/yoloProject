@@ -6,6 +6,7 @@ import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Scalar;
 import org.bytedeco.opencv.opencv_core.Size;
+import org.bytedeco.opencv.opencv_core.StringVector;
 import org.bytedeco.opencv.opencv_dnn.*;
 
 import static org.bytedeco.opencv.global.opencv_dnn.*;
@@ -20,9 +21,12 @@ public class DNNExtractor {
 	
 	
 	public DNNExtractor() {		
-		//Create the importer of Caffe framework network
-		net = readNetFromCaffe(new File(Parameters.DEEP_PROTO).getPath(), new File(Parameters.DEEP_MODEL).getPath());
-        
+		//Create the importer of Darknet framework network
+		net = readNetFromDarknet(new File(Parameters.DEEP_CFG_DARK).getPath(), new File(Parameters.DEEP_W_DARK).getPath());
+
+		//for(StringVector.Iterator iter = net.getLayerNames().begin(); iter != net.getLayerNames().end(); iter = iter.increment())
+		//	System.out.println(iter.get().getString());
+
         imgSize = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
 
         if (Parameters.MEAN_VALUES != null) {
@@ -45,9 +49,12 @@ public class DNNExtractor {
 		net.setInput(inputBlob, "data", 1.0, meanValues);
 		
 		// compute output
-		Mat prob = net.forward(layer);
+		Mat prob = net.forward("conv_50");
 
 		float[] features = new float[(int) prob.total()];
+		for(float f : features)
+			System.out.print(Float.toString(f) + ",");
+		System.out.println();
 		
 		// gather output of "fc7" layer
 		((FloatRawIndexer) prob.createIndexer()).get(0, features);
