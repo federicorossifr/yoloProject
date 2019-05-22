@@ -7,6 +7,7 @@ path=$1
 tagsp=$2
 outdir=$3
 imgs="$path*.jpg"
+i=1
 
 
 size=$(ls -l  $imgs | wc -l)
@@ -16,11 +17,12 @@ for f in $imgs; do
 	filename="${filename%.*}"
 	tagsf="tags$(echo $filename | grep -o -E '[0-9]+')"
 	dest="$outdir/$filename.txt"
-	echo Extracting from $filename
-#	./darknet detect cfg/yolov3.cfg ./yolov3.weights $f 2> /dev/null  > $dest
+	echo "($i/$size) extracting from $filename..."
+	./darknet detect cfg/yolov3.cfg ./yolov3.weights $f 2> /dev/null  > $dest
 	echo Fetching human tags from $filename
 	source_tag="$tagsp/$tagsf.txt"
 	tags_content=$(tr -s '\r\n' ',' < $source_tag | sed -e 's/,$/\n/')
 	echo $tags_content >> $dest
 	echo Extracted to $dest
+	((i++))
 done
