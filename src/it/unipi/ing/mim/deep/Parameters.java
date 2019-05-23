@@ -5,8 +5,8 @@ import java.io.File;
 public class Parameters {
 	
 	//DEEP parameters
-	public static final String DEEP_PROTO = "data/caffe/yolov3.cfg";
-	public static final String DEEP_MODEL = "data/caffe/yolov3.weights";
+	public static final String DEEP_PROTO = "data/caffe/hybridCNN_deploy_upgraded.prototxt";
+	public static final String DEEP_MODEL = "data/caffe/hybridCNN_iter_700000_upgraded.caffemodel";
 	public static final double[] MEAN_VALUES = {104, 117, 123, 0};
 	
 	public static final String DEEP_LAYER = "fc6";
