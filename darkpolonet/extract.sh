@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ "$#" -ne 3 ]; then
     echo "Usage: extract.sh path_to_images path_to_tags path_to_txt_output"
     exit
