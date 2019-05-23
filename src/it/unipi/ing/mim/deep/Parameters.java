@@ -10,8 +10,8 @@ public class Parameters {
 	public static final double[] MEAN_VALUES = {104, 117, 123, 0};
 	
 	public static final String DEEP_LAYER = "fc6";
-	public static final int IMG_WIDTH = 608;
-	public static final int IMG_HEIGHT = 608;
+	public static final int IMG_WIDTH = 227;
+	public static final int IMG_HEIGHT = 227;
 	
 	
 	//Image Source Folder
