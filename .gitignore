@@ -1,7 +1,7 @@
 .metadata
+#data/
 bin/
 tmp/
-data/
 out/
 *.tmp
 *.bak
