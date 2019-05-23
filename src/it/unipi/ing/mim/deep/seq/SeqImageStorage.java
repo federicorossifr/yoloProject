@@ -42,7 +42,8 @@ public class SeqImageStorage {
 				ArrayList<Mat> bb_mat = dimg.getRegionsOfInterest();
 
 				// for each image bounding box
-				for(int bb_index=0; i<bb_list.size(); bb_index++) {
+				for(int bb_index=0; bb_index<bb_list.size(); bb_index++) {
+					System.out.println("Bounding box " + bb_index + "/" + bb_list.size());
 					long time = -System.currentTimeMillis();
 					float[] features = extractor.extract(bb_mat.get(i), Parameters.DEEP_LAYER);
 					time += System.currentTimeMillis();
