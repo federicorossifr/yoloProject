@@ -86,6 +86,7 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
+            <exclude name="**/YoloGUI.java"/>
             <classpath refid="YOLO.classpath"/>
         </javac>
     </target>
@@ -103,7 +104,7 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="SeqImageStorage (2)">
+    <target name="SeqImageStorage">
         <java classname="it.unipi.ing.mim.deep.seq.SeqImageStorage" failonerror="true" fork="yes">
             <classpath refid="YOLO.classpath"/>
         </java>
@@ -118,7 +119,7 @@
             <classpath refid="YOLO.classpath"/>
         </java>
     </target>
-    <target name="SeqImageSearch (1)">
+    <target name="SeqImageSearch">
         <java classname="it.unipi.ing.mim.deep.seq.SeqImageSearch" failonerror="true" fork="yes">
             <classpath refid="YOLO.classpath"/>
         </java>
