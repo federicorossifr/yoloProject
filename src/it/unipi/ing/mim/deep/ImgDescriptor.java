@@ -2,6 +2,7 @@ package it.unipi.ing.mim.deep;
 
 import java.io.Serializable;
 
+
 public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	private static final long serialVersionUID = 1L;
