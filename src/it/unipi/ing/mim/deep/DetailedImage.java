@@ -81,6 +81,10 @@ public class DetailedImage {
 		return humanTags;
 	}
 	
+	public String serializeHumanTags() {
+		return String.join(",", humanTags);
+	}
+
 	/*public static void main(String[] args) throws IOException {
 		String yoloData = "data/img/extracted/im10001.txt";
 		String imageData = "data/img/mirflickr/im10001.jpg";
