@@ -51,7 +51,7 @@ public class DNNExtractor {
 		
 		// gather output of "fc7" layer
 		((FloatRawIndexer) prob.createIndexer()).get(0, features);
-		for(float f: features) System.out.println(f);
+		//for(float f: features) System.out.println(f);
 		return features;
 	}
 }
