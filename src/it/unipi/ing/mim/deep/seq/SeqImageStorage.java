@@ -36,8 +36,8 @@ public class SeqImageStorage {
 			System.out.println(i + " - extracting " + img_files[i].getName());
 			
 			try {
-				// get bounding boxes coordinates and subimages
-				DetailedImage dimg = new DetailedImage(img_files[i], new File(metaFolder.getPath() + "/" + img_files[i]));
+				DetailedImage dimg = new DetailedImage(img_files[i],
+						new File(metaFolder.getPath() + "/" + getFileNameWithoutExtension(img_files[i]) + ".txt"));
 				ArrayList<int[]> bb_list = dimg.getBoundingBoxes();
 				ArrayList<Mat> bb_mat = dimg.getRegionsOfInterest();
 
@@ -55,5 +55,10 @@ public class SeqImageStorage {
 		}
 		
 		return descs;	
+	}
+
+	private String getFileNameWithoutExtension(File file) {
+		String filename = file.getName();
+		return filename.substring(0, filename.length()-4);
 	}
 }
