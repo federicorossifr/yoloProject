@@ -10,7 +10,6 @@
 *.pyc
 old/
 mnist/
-data/
 caffe/
 grasp/
 images/
