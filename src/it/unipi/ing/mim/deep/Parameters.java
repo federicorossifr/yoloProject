@@ -17,6 +17,9 @@ public class Parameters {
 	//Image Source Folder
 	public static final File SRC_FOLDER = new File("data/img/mirflickr");
 	
+	//Image Meta-Data Folder
+	public static final File META_SRC_FOLDER = new File("data/img/meta/");
+	
 	//Features Storage File
 	public static final File STORAGE_FILE = new File("data/deep.seq.dat");
 	

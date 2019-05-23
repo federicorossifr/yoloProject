@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="YOLO">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="YOLO.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/commons-logging-1.2.jar"/>
+        <pathelement location="lib/elasticsearch-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-cli-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-core-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-launchers-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-rest-client-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-rest-high-level-client-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-secure-sm-6.7.0.jar"/>
+        <pathelement location="lib/elasticsearch-x-content-6.7.0.jar"/>
+        <pathelement location="lib/HdrHistogram-2.1.9.jar"/>
+        <pathelement location="lib/hppc-0.7.1.jar"/>
+        <pathelement location="lib/httpasyncclient-4.1.4.jar"/>
+        <pathelement location="lib/httpclient-4.5.8.jar"/>
+        <pathelement location="lib/httpcore-4.4.11.jar"/>
+        <pathelement location="lib/httpcore-nio-4.4.11.jar"/>
+        <pathelement location="lib/jackson-core-2.8.11.jar"/>
+        <pathelement location="lib/jackson-dataformat-cbor-2.8.11.jar"/>
+        <pathelement location="lib/jackson-dataformat-smile-2.8.11.jar"/>
+        <pathelement location="lib/jackson-dataformat-yaml-2.8.11.jar"/>
+        <pathelement location="lib/java-version-checker-6.7.0.jar"/>
+        <pathelement location="lib/javacpp.jar"/>
+        <pathelement location="lib/javacv.jar"/>
+        <pathelement location="lib/jna-4.5.1.jar"/>
+        <pathelement location="lib/joda-time-2.10.1.jar"/>
+        <pathelement location="lib/jopt-simple-5.0.2.jar"/>
+        <pathelement location="lib/jts-core-1.15.0.jar"/>
+        <pathelement location="lib/lang-mustache-client-6.7.0.jar"/>
+        <pathelement location="lib/log4j-1.2-api-2.11.1.jar"/>
+        <pathelement location="lib/log4j-api-2.11.1.jar"/>
+        <pathelement location="lib/log4j-core-2.11.1.jar"/>
+        <pathelement location="lib/lucene-analyzers-common-7.7.0.jar"/>
+        <pathelement location="lib/lucene-backward-codecs-7.7.0.jar"/>
+        <pathelement location="lib/lucene-core-7.7.0.jar"/>
+        <pathelement location="lib/lucene-grouping-7.7.0.jar"/>
+        <pathelement location="lib/lucene-highlighter-7.7.0.jar"/>
+        <pathelement location="lib/lucene-join-7.7.0.jar"/>
+        <pathelement location="lib/lucene-memory-7.7.0.jar"/>
+        <pathelement location="lib/lucene-misc-7.7.0.jar"/>
+        <pathelement location="lib/lucene-queries-7.7.0.jar"/>
+        <pathelement location="lib/lucene-queryparser-7.7.0.jar"/>
+        <pathelement location="lib/lucene-sandbox-7.7.0.jar"/>
+        <pathelement location="lib/lucene-spatial-7.7.0.jar"/>
+        <pathelement location="lib/lucene-spatial-extras-7.7.0.jar"/>
+        <pathelement location="lib/lucene-spatial3d-7.7.0.jar"/>
+        <pathelement location="lib/lucene-suggest-7.7.0.jar"/>
+        <pathelement location="lib/opencv-linux-x86_64.jar"/>
+        <pathelement location="lib/opencv-linux-x86.jar"/>
+        <pathelement location="lib/opencv-macosx-x86_64.jar"/>
+        <pathelement location="lib/opencv-windows-x86_64.jar"/>
+        <pathelement location="lib/opencv-windows-x86.jar"/>
+        <pathelement location="lib/opencv.jar"/>
+        <pathelement location="lib/plugin-classloader-6.7.0.jar"/>
+        <pathelement location="lib/rank-eval-client-6.7.0.jar"/>
+        <pathelement location="lib/snakeyaml-1.17.jar"/>
+        <pathelement location="lib/spatial4j-0.7.jar"/>
+        <pathelement location="lib/t-digest-3.2.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <exclude name="**/YoloGUI.java"/>
+            <classpath refid="YOLO.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="SeqImageStorage">
+        <java classname="it.unipi.ing.mim.deep.seq.SeqImageStorage" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+        </java>
+    </target>
+    <target name="TestInference">
+        <java classname="it.unipi.ing.mim.deep.seq.TestInference" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+        </java>
+    </target>
+    <target name="BBoxExtractor">
+        <java classname="it.unipi.ing.mim.deep.BBoxExtractor" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+        </java>
+    </target>
+    <target name="SeqImageSearch">
+        <java classname="it.unipi.ing.mim.deep.seq.SeqImageSearch" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+        </java>
+    </target>
+</project>
