@@ -54,10 +54,16 @@ public class DetailedImage {
 		metaReader.close();
 	}
 	
+	/*
+	 * Method to extract regions of interest pixels using the bounding boxes extracted
+	 * from YOLO
+	 */
 	public ArrayList<Mat> getRegionsOfInterest() {
 		ArrayList<Mat> rois = new ArrayList<>();
 		for(int[] bbox: boundingBoxes) {
+			// YOLO extracts bounding boxes as top-left corner and bottom-right corner
 			int left=bbox[0],right=bbox[1],top=bbox[2],bottom=bbox[3];
+			// OpenCv ROIs want top-left corner and width,height of the rectangle
 			int width = Math.abs(right-left);
 			int height = Math.abs(bottom-top);
 			Rect r = new Rect(left,top,width,height);
