@@ -1,0 +1,5 @@
+person;404,423,247,289
+person;253,270,247,291
+person;367,385,249,289
+person;285,300,247,288
+light,swings,dark,blur,motion,bushgardens,virginia,usa
