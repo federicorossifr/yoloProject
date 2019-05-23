@@ -45,10 +45,10 @@ public class SeqImageStorage {
 				for(int bb_index=0; bb_index<bb_list.size(); bb_index++) {
 					System.out.println("Bounding box " + bb_index + "/" + bb_list.size());
 					long time = -System.currentTimeMillis();
-					float[] features = extractor.extract(bb_mat.get(i), Parameters.DEEP_LAYER);
+					float[] features = extractor.extract(bb_mat.get(bb_index), Parameters.DEEP_LAYER);
 					time += System.currentTimeMillis();
 					System.out.println(time);
-					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_list.get(i)));
+					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_list.get(bb_index)));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
