@@ -3,7 +3,7 @@ CUDNN=0
 OPENCV=0
 OPENMP=1
 DEBUG=0
-
+AVX=1
 ARCH= -gencode arch=compute_30,code=sm_30 \
       -gencode arch=compute_35,code=sm_35 \
       -gencode arch=compute_50,code=[sm_50,compute_50] \
@@ -28,9 +28,13 @@ OPTS=-Ofast
 LDFLAGS= -lm -pthread 
 COMMON= -Iinclude/ -Isrc/
 CFLAGS=-Wall -Wno-unused-result -Wno-unknown-pragmas -Wfatal-errors -fPIC
-
+AVXFLAGS = -msse3 -mavx -mavx2
 ifeq ($(OPENMP), 1) 
 CFLAGS+= -fopenmp
+endif
+
+ifeq ($(AVX),1)
+	CFLAGS+= -msse3 -mavx -mavx2
 endif
 
 ifeq ($(DEBUG), 1) 

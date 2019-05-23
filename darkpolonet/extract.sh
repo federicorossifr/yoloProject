@@ -18,7 +18,7 @@ for f in $imgs; do
 	tagsf="tags$(echo $filename | grep -o -E '[0-9]+')"
 	dest="$outdir/$filename.txt"
 	echo "($i/$size) extracting from $filename..."
-	./darknet detect cfg/yolov3.cfg ./yolov3.weights $f 2> /dev/null  > $dest
+	./darknet detect cfg/yolov3-tiny.cfg ./yolov3-tiny.weights $f 2> /dev/null  > $dest
 	echo Fetching human tags from $filename
 	source_tag="$tagsp/$tagsf.txt"
 	tags_content=$(tr -s '\r\n' ',' < $source_tag | sed -e 's/,$/\n/')

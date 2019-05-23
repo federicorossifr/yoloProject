@@ -5,17 +5,17 @@ import java.io.File;
 public class Parameters {
 	
 	//DEEP parameters
-	public static final String DEEP_PROTO = "data/caffe/hybridCNN_deploy.prototxt";
-	public static final String DEEP_MODEL = "data/caffe/hybridCNN_iter_700000.caffemodel";
+	public static final String DEEP_PROTO = "data/caffe/yolov3.cfg";
+	public static final String DEEP_MODEL = "data/caffe/yolov3.weights";
 	public static final double[] MEAN_VALUES = {104, 117, 123, 0};
 	
 	public static final String DEEP_LAYER = "fc6";
-	public static final int IMG_WIDTH = 227;
-	public static final int IMG_HEIGHT = 227;
+	public static final int IMG_WIDTH = 608;
+	public static final int IMG_HEIGHT = 608;
 	
 	
 	//Image Source Folder
-	public static final File SRC_FOLDER = new File("data/img");
+	public static final File SRC_FOLDER = new File("data/img/mirflickr");
 	
 	//Features Storage File
 	public static final File STORAGE_FILE = new File("data/deep.seq.dat");
