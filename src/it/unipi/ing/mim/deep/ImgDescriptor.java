@@ -13,11 +13,22 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	
 	private double dist; // used for sorting purposes
 	
+	private int[] boundingBox;
+	
 	public ImgDescriptor(float[] features, String id) {
+		this(features, id, null);
+	}
+	
+	public ImgDescriptor(float[] features, String id, int[] boundingBox) {
 		if (features != null) {
 			float norm2 = evaluateNorm2(features);
 			this.normalizedVector = getNormalizedVector(features, norm2);
 		}
+
+		if(boundingBox.length != 4 && boundingBox != null)
+			throw new IllegalArgumentException("Bounding box array size is not 4");
+		this.setBoundingBox(boundingBox);
+
 		this.id = id;
 	}
 	
@@ -31,6 +42,14 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public int[] getBoundingBox() {
+		return boundingBox;
+	}
+
+	public void setBoundingBox(int[] boundingBox) {
+		this.boundingBox = boundingBox;
 	}
 
 	public double getDist() {
@@ -80,5 +99,4 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		
 		return norm2;
 	}
-    
 }
