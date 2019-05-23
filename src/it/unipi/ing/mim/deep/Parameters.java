@@ -46,5 +46,13 @@ public class Parameters {
 	public static final File RESULTS_HTML = new File("out/deep.seq.html");
 	public static final File RESULTS_HTML_ELASTIC = new File("out/deep.elastic.html");
 	public static final File RESULTS_HTML_REORDERED = new File("out/deep.reordered.html");
+	
+	//Index class members name
+	public static final String IMAGE_ID = "ImageID";
+	public static final String CLASS = "Class";
+	public static final String BBOX = "BBox";
+	public static final String DEEP_FEATURES = "DeepFeatures";
+
+
 
 }
