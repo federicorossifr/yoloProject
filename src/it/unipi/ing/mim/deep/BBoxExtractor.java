@@ -98,7 +98,8 @@ public class BBoxExtractor {
 				boxesDetected.push_back(bbox);
 				confidences.add(currentMax);
 				classIdx.add(currentMaxIndex-4);
-				//System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+currentMax+" Class:"+(currentMaxIndex-4));
+				if(currentMax > 0.1)
+					System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+currentMax+" Class:"+(currentMaxIndex-4));
 			}
 		}
 
