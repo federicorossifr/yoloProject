@@ -30,11 +30,12 @@ public class ElasticImgIndexing implements AutoCloseable {
 	
 	private List<ImgDescriptor> imgDescDataset;
 	private int topKIdx;
-	public final static String INDEX_NAME = "f2t_index";
+
 	private RestHighLevelClient client;
 		
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
+			esImgIdx.deleteIndex();
 			esImgIdx.createIndex();
 			esImgIdx.index();	
 		}
@@ -66,7 +67,13 @@ public class ElasticImgIndexing implements AutoCloseable {
 		request.settings(s);
 		idx.create(request, RequestOptions.DEFAULT);
 	}
-	
+
+	public void deleteIndex() throws IOException {
+		IndicesClient idx = client.indices();
+		DeleteIndexRequest request = new DeleteIndexRequest(Parameters.INDEX_NAME);
+		idx.delete(request, RequestOptions.DEFAULT);
+	}
+
 	//TODO
 	public void index() throws IOException {
 		//LOOP
@@ -82,14 +89,14 @@ public class ElasticImgIndexing implements AutoCloseable {
 			client.index(req, RequestOptions.DEFAULT);
 
 			i++;
-			if(i==1000)
-				break;
+			//if(i==1000)
+			//	break;
 		}
 	}
 	
 	//TODO
 	private IndexRequest composeRequest(ImgDescriptor imgDesc, DetailedImage detImg) {
-		IndexRequest request = new IndexRequest(INDEX_NAME,"doc");
+		IndexRequest request = new IndexRequest(Parameters.INDEX_NAME, "doc");
 		Map<String,String> jMap = new HashMap<String, String>();
 		
 		// ImgDescriptor -> (imgid, boundingboxindex, features (of the single bounding box))
@@ -101,11 +108,11 @@ public class ElasticImgIndexing implements AutoCloseable {
 		jMap.put(Fields.BOUNDING_BOX, detImg.serializeBoundingBoxes().get(bb_index));
 		
 		// Human tags are stored in DetailedImage
-		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags());
+		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags().replace(","," "));
 
 		// Remaining fields are stored in ImgDescriptor
 		jMap.put(Fields.IMG_ID, imgDesc.getId());		
-		jMap.put(Fields.BOUNDING_BOX_SURROGATE, pivots.features2Text(imgDesc, topKIdx));
+		jMap.put(Fields.BOUNDING_BOX_FEAT, pivots.features2Text(imgDesc, topKIdx));
 		request.source(jMap);
 
 		return request;

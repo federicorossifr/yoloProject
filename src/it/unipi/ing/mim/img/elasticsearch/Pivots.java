@@ -85,16 +85,22 @@ public class Pivots {
 	//TODO
 	public String features2Text(ImgDescriptor imgF, int topK) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		//perform a sequential search to get the topK most similar pivots
-		List<ImgDescriptor> l = seqPivots.search(imgF, topK);
+		List<ImgDescriptor> topk_elems = seqPivots.search(imgF, topK);
 
 		//LOOP
+		for(int i = 0; i < topk_elems.size(); i++)
+		{
+			ImgDescriptor img = topk_elems.get(i);
+
 			//compose the text string using pivot ids
-		for(ImgDescriptor ll:l) {
-			sb.append(ll.getId());
-		}		
+			for(int j = i; j < topK; j++) {
+				sb.append(img.getId());
+				sb.append(' ');
+			}
+		}
+
 		return sb.toString();
 	}
-	
 }
