@@ -29,8 +29,8 @@ public class BBoxExtractor {
 	private Scalar meanValues;
 	private Net net;
 	private Size imgSize;
-	private final static String DARK_CFG = "data/caffe/yolov3-tiny.cfg";
-	private final static String DARK_WGH = "data/caffe/yolov3-tiny.weights";
+	private final static String DARK_CFG = "data/caffe/yolov3.cfg";
+	private final static String DARK_WGH = "data/caffe/yolov3.weights";
 	private final static int DARK_DIM = 608;
 	
 	public BBoxExtractor() {		
@@ -98,7 +98,7 @@ public class BBoxExtractor {
 				boxesDetected.push_back(bbox);
 				confidences.add(currentMax);
 				classIdx.add(currentMaxIndex-4);
-				System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+currentMax+" Class:"+(currentMaxIndex-4));
+				//System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+currentMax+" Class:"+(currentMaxIndex-4));
 			}
 		}
 
@@ -109,6 +109,7 @@ public class BBoxExtractor {
 		System.out.println("Found: "+confidences.size()+ " "+boxesDetected.size());
 		NMSBoxes(boxesDetected, confs, confidenceThreshold, nmsThreshold,outIndices);
 		ArrayList<Pair<String,Rect>> result = new ArrayList<Pair<String,Rect>>();
+		
 		for(int i = 0; i < outIndices.length;++i) {
 			if(outIndices[i] > 0) {
 				String className = convertToClassName(classIdx.get(outIndices[i]));
@@ -117,6 +118,8 @@ public class BBoxExtractor {
 				result.add(p);
 			}
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("Done in: "+(end-start)/1000);				
 		return result;
 	}
 	
