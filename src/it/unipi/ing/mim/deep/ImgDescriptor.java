@@ -99,4 +99,8 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		
 		return norm2;
 	}
+	
+	public String toString() {
+		return  DetailedImage.getFileNameWithoutExtension(id) + "-" + boundingBoxIndex;
+	}
 }

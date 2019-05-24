@@ -191,6 +191,10 @@ public class DetailedImage {
 	
 	public static String getFileNameWithoutExtension(File file) {
 		String filename = file.getName();
-		return filename.substring(0, filename.length()-4);
+		return getFileNameWithoutExtension(filename);
+	}
+	
+	public static String getFileNameWithoutExtension(String fileStr) {
+		return fileStr.substring(0, fileStr.length()-4);
 	}
 }

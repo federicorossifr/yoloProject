@@ -96,7 +96,7 @@ public class Pivots {
 
 			//compose the text string using pivot ids
 			for(int j = i; j < topK; j++) {
-				sb.append(img.getId());
+				sb.append(img.toString());
 				sb.append(' ');
 			}
 		}
