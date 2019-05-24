@@ -107,11 +107,11 @@ public class ElasticImgSearching implements AutoCloseable {
 	private SearchRequest composeSearch(String query, int k) {
 		//Initialize SearchRequest and set query and k
 		SearchRequest searchRequest = null;
-		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.BOUNDING_BOX_SURROGATE);
+		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.BOUNDING_BOX_FEAT);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
 		sb.query(qb);
 		sb.size(k);
-		searchRequest = new SearchRequest(ElasticImgIndexing.INDEX_NAME);
+		searchRequest = new SearchRequest(Parameters.INDEX_NAME);
 		searchRequest.types("doc");
 		searchRequest.source(sb);
 	    return searchRequest;
