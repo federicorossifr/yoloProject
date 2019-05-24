@@ -11,6 +11,7 @@
 #include "stb_image_write.h"
 
 int windows = 0;
+extern char curr_fname[256];
 
 float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
@@ -252,7 +253,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
                 }
-                printf("%s;", names[j]);
+                //printf("%s;", names[j]);
             }
         }
         if(class >= 0){
@@ -290,7 +291,13 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
             // HERE WE HAVE THE BBOX
-            printf("%d,%d,%d,%d\n",left,right,top,bot);
+            char outPath[256];
+            sprintf(outPath,"../data/img/extracted/%s.txt",curr_fname);
+            FILE* fp = fopen(outPath,"w");
+            fprintf(fp,"%s;%d,%d,%d,%d\n",labelstr,left,right,top,bot);
+            fflush(fp);
+            fclose(fp);
+            printf("%s,%d,%d,%d,%d\n%s\n",labelstr,left,right,top,bot,outPath);
             //MY JOB IS DONE HERE, I can go
             //
             draw_box_width(im, left, top, right, bot, width, red, green, blue);

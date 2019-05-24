@@ -2,6 +2,7 @@
 
 static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,31,32,33,34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,67,70,72,73,74,75,76,77,78,79,80,81,82,84,85,86,87,88,89,90};
 
+char curr_fname[256];
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear)
 {
@@ -573,17 +574,28 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     char buff[256];
     char *input = buff;
     float nms=.45;
+    FILE* imgList;
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    size_t read;
+
+    fp = fopen("list.txt", "r");
+    if (fp == NULL) exit(EXIT_FAILURE);
     while(1){
         if(filename){
             strncpy(input, filename, 256);
         } else {
-            printf("Enter Image Path: ");
+            //../data/img/mirflickr/
             fflush(stdout);
-            input = fgets(input, 256, stdin);
-            if(!input) return;
-            strtok(input, "\n");
+            read = getline(&line, &len, fp);    
+            //input = fgets(input, 256, fp);
+            if(!line) return;
+            printf("Detecting image: %s",line);      
+            strtok(line, "\n");
+            strcpy(curr_fname,line+22);
         }
-        image im = load_image_color(input,0,0);
+        image im = load_image_color(line,0,0);
         image sized = letterbox_image(im, net->w, net->h);
         //image sized = resize_image(im, net->w, net->h);
         //image sized2 = resize_max(im, net->w);
@@ -604,18 +616,18 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes);
         free_detections(dets, nboxes);
         if(outfile){
-            save_image(im, outfile);
+            //save_image(im, outfile);
         }
         else{
-            save_image(im, "predictions");
+            //save_image(im, "predictions");
 #ifdef OPENCV
-            make_window("predictions", 512, 512, 0);
-            show_image(im, "predictions", 0);
+            //make_window("predictions", 512, 512, 0);
+            //show_image(im, "predictions", 0);
 #endif
         }
 
-        free_image(im);
-        free_image(sized);
+        //free_image(im);
+        //free_image(sized);
         if (filename) break;
     }
 }
