@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.MatVector;
@@ -68,36 +69,38 @@ public class BBoxExtractor {
 		// Convert Mat to dnn::Blob image batch
 
 		Mat inputBlob = blobFromImage(img,1/255.f,imgSize,new Scalar(0),true,false,CV_32F);
-			
 		// set the network input
 		long start = System.currentTimeMillis();
 		net.setInput(inputBlob);
-		Mat prob = net.forward();
+	/*	Mat prob = net.forward();
 		for(int i=0; i<prob.rows();++i) {
 			for(int j=0;j < prob.cols();++j) {
 				float f = prob.row(i).col(j).getFloatBuffer().get();
 				
 			}
 			
-		}
+		}*/
+		StringVector names = net.getUnconnectedOutLayersNames();
+		
 		long end = System.currentTimeMillis();
 		System.out.println("Done in: "+(end-start)/1000);
 		// compute output
-	/*	MatVector probs = new MatVector();
-		StringVector names = net.getUnconnectedOutLayersNames();
-
+		MatVector probs = new MatVector();
+		
 		net.forward(probs,names);
+		
 		for(int i = 0; i < probs.size(); ++i) {
 			
-			Mat prob = probs.get(i);
+			Mat prob1 = probs.get(i);
 			System.out.println(names.get(i).getString());
-			System.out.println(prob.cols()+" "+prob.rows());
-			for(int j = 0; j < prob.rows(); ++j) {
-				Mat row = prob.row(j);
+			//System.out.println(prob1.cols()+" "+prob1.rows());
+			for(int j = 0; j < prob1.rows(); ++j) {
+				Mat row = prob1.row(j);
 				float[] rowF = new float[(int)row.cols()];
 				for(int k=0; k<row.cols();++k) {
-					Mat lll = row.col(k);
-					rowF[k] = lll.getFloatBuffer().get();
+					//Mat lll = row.col(k);
+					//rowF[k] = lll.getFloatBuffer().get();
+					rowF[k] = prob1.row(j).cols(k).getFloatBuffer().get();
 				}
 				
 				//minMaxLoc(row.colRange(6, row.cols()-1), res);
@@ -108,10 +111,10 @@ public class BBoxExtractor {
 				int left = Math.abs(centerX-width/2);
 				int top = Math.abs(centerY -height/2);
 					System.out.print("["+left+","+top+"]");
-					for(int bb=4; bb<rowF.length;++bb) System.out.print(rowF[bb]+",");
+					for(int bb=4; bb<rowF.length;bb++) System.out.print(rowF[bb]+",");
 					System.out.println();
 			}
-		}*/
+		}
 		
 
 
