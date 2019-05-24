@@ -4,7 +4,12 @@ import static org.bytedeco.opencv.global.opencv_dnn.blobFromImage;
 import static org.bytedeco.opencv.global.opencv_dnn.readNetFromDarknet;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
 import static org.bytedeco.opencv.global.opencv_dnn.NMSBoxes;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
@@ -29,17 +34,24 @@ public class BBoxExtractor {
 	private Scalar meanValues;
 	private Net net;
 	private Size imgSize;
+	private ArrayList<String> cocoClasses = new ArrayList<String>();
 	private final static String DARK_CFG = "data/caffe/yolov3.cfg";
 	private final static String DARK_WGH = "data/caffe/yolov3.weights";
+	private final static String COCO_CLASSES = "data/caffe/coco.names";
 	private final static int DARK_DIM = 608;
 	
-	public BBoxExtractor() {		
+	public BBoxExtractor() throws IOException {		
 		//Create the importer of Caffe framework network
 		net = readNetFromDarknet(DARK_CFG,DARK_WGH);
 		imgSize = new Size(DARK_DIM,DARK_DIM);
         if (Parameters.MEAN_VALUES != null) {
 			meanValues = new Scalar(Parameters.MEAN_VALUES[0], Parameters.MEAN_VALUES[1], Parameters.MEAN_VALUES[2], Parameters.MEAN_VALUES[3]);
         }		
+        FileReader cocoReader = new FileReader(new File(COCO_CLASSES));
+        BufferedReader bufferedCocoReader = new BufferedReader(cocoReader);
+        String cocoLine = "";
+        while((cocoLine=bufferedCocoReader.readLine())!=null)
+        	cocoClasses.add(cocoLine);
    }
 
 	public void extract(File image) {
@@ -58,7 +70,7 @@ public class BBoxExtractor {
 		RectVector boxesDetected = new RectVector();
 		ArrayList<Float> confidences = new ArrayList<>();
 		ArrayList<Integer> classIdx = new ArrayList<Integer>();
-		float confidenceThreshold = 0.6f,nmsThreshold=0.5f;
+		float confidenceThreshold = 0.1f,nmsThreshold=0.5f;
 		for(int i = 0; i < regionProposals.size(); ++i) {
 			
 			Mat proposal = regionProposals.get(i);
@@ -95,11 +107,13 @@ public class BBoxExtractor {
 				int top = Math.abs(centerY -height/2);
 				int bottom = Math.abs(centerY+height/2);
 				Rect bbox = new Rect(left,top,width,height);
-				boxesDetected.push_back(bbox);
-				confidences.add(currentMax);
-				classIdx.add(currentMaxIndex-4);
-				if(currentMax > 0.1)
-					System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+currentMax+" Class:"+(currentMaxIndex-4));
+
+				if(currentMax > confidenceThreshold) {
+					System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+objConfidence+" Class:"+convertToClassName(currentMaxIndex-5));
+					boxesDetected.push_back(bbox);
+					confidences.add(currentMax);
+					classIdx.add(currentMaxIndex-4);					
+				}
 			}
 		}
 
@@ -126,12 +140,12 @@ public class BBoxExtractor {
 	
 	//TODO
 	public String convertToClassName(int idx) {
-		return Integer.toString(idx);
+		return cocoClasses.get(idx	);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		BBoxExtractor b = new BBoxExtractor();
-		b.extract(new File("data/img/mirflickr/im12351.jpg"));
+		b.extract(new File("data/img/mirflickr/im10001.jpg"));
 		
 	}
 }
