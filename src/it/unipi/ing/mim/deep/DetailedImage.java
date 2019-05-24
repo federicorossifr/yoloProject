@@ -35,13 +35,18 @@ public class DetailedImage {
 			String[] splittedYoloData = metaLine.split(";");
 			//If the split does not return two element-array we have done with yoloData
 			if(splittedYoloData.length < 2) break;
-			//Otherwise, first element is class-name, second is a bounding box.
-			classNames.add(splittedYoloData[0]);
-			System.out.println("Found class: "+splittedYoloData[0]+" in: "+splittedYoloData[1]);
+			//Otherwise last element is a list of int coordinates for bounding boxes
+			String[] coords = splittedYoloData[splittedYoloData.length-1].split(",");
+			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();			
+			//From first element to the n-1 element there are class-names, for the bounding box.
+			for(int i = 0; i < splittedYoloData.length -1; ++i) {
+				System.out.println("Found class: "+splittedYoloData[i]+" in: "+splittedYoloData[splittedYoloData.length-1]);				
+				classNames.add(splittedYoloData[i]);
+				boundingBoxes.add(intCoords);
+
+			}
 			//Second element is a list of int-coordinates
-			String[] coords = splittedYoloData[1].split(",");
-			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();
-			boundingBoxes.add(intCoords);
+
 		}
 		
 		//Extract flickr-tags, metaLine is a list of tags separated by comma
@@ -128,8 +133,8 @@ public class DetailedImage {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String yoloData = "data/img/extracted/im10055.txt";
-		String imageData = "data/img/mirflickr/im10055.jpg";
+		String yoloData = "data/img/extracted/im21350.txt";
+		String imageData = "data/img/mirflickr/im21350.jpg";
 		DetailedImage di = new DetailedImage(new File(imageData), new File(yoloData));
 		ArrayList<Mat> rois = di.getRegionsOfInterest();
 		ArrayList<String> bboxes = di.serializeBoundingBoxes();
