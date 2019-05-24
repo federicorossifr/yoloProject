@@ -3,7 +3,10 @@ package it.unipi.ing.mim.deep;
 import static org.bytedeco.opencv.global.opencv_dnn.blobFromImage;
 import static org.bytedeco.opencv.global.opencv_dnn.readNetFromDarknet;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
+import static org.bytedeco.opencv.global.opencv_imgproc.*;
+
 import static org.bytedeco.opencv.global.opencv_dnn.NMSBoxes;
+import static org.bytedeco.opencv.global.opencv_highgui.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,9 +57,15 @@ public class BBoxExtractor {
         	cocoClasses.add(cocoLine);
    }
 
-	public void extract(File image) {
+	public ArrayList<Pair<String,Rect>>  extract(File image) {
 		Mat img = imread(image.getPath());
-		extract(img);
+		ArrayList<Pair<String,Rect>> boxes =  extract(img);
+		for(Pair<String,Rect> p:boxes) {
+			rectangle(img, p.getValue(), new Scalar(0.0,0.0,255.0,0.4));			
+		}
+		imshow("Image",img);
+		waitKey();	
+		return boxes;
 	}
 
 	public ArrayList<Pair<String,Rect>> extract(Mat img) {
@@ -98,22 +107,19 @@ public class BBoxExtractor {
 						}
 					}					
 				}
-				int centerX = (int)(yoloFeatures[0]*DARK_DIM);
-				int centerY = (int)(yoloFeatures[1]*DARK_DIM);
-				int height = (int)(yoloFeatures[2]*DARK_DIM);
-				int width = (int)(yoloFeatures[3]*DARK_DIM);
+				int centerX = (int)(yoloFeatures[0]*img.cols());
+				int centerY = (int)(yoloFeatures[1]*img.rows());
+				int height = (int)(yoloFeatures[3]*img.rows());
+				int width = (int)(yoloFeatures[2]*img.cols());
 				int left = Math.abs(centerX-width/2);
 				int right = Math.abs(centerX+width/2);
 				int top = Math.abs(centerY -height/2);
 				int bottom = Math.abs(centerY+height/2);
 				Rect bbox = new Rect(left,top,width,height);
-
-				if(currentMax > confidenceThreshold) {
-					System.out.println("["+left+","+top+","+right+","+bottom+"] Conf: "+objConfidence+" Class:"+convertToClassName(currentMaxIndex-5));
-					boxesDetected.push_back(bbox);
-					confidences.add(currentMax);
-					classIdx.add(currentMaxIndex-4);					
-				}
+				boxesDetected.push_back(bbox);
+				confidences.add(objConfidence);
+				classIdx.add(currentMaxIndex-5);					
+				
 			}
 		}
 
@@ -129,6 +135,8 @@ public class BBoxExtractor {
 			if(outIndices[i] > 0) {
 				String className = convertToClassName(classIdx.get(outIndices[i]));
 				Rect bbox = boxesDetected.get(outIndices[i]);
+				System.out.println("["+bbox.x()+" "+bbox.y()+" "+bbox.width()+" "+bbox.height()+" ] "+className);
+				System.out.println(bbox.x()+" "+(bbox.x()+bbox.width())+" "+bbox.y()+" "+(bbox.y()+bbox.height()));
 				Pair<String,Rect> p = new Pair<String,Rect>(className,bbox);
 				result.add(p);
 			}
@@ -145,7 +153,8 @@ public class BBoxExtractor {
 	
 	public static void main(String[] args) throws IOException {
 		BBoxExtractor b = new BBoxExtractor();
-		b.extract(new File("data/img/mirflickr/im10001.jpg"));
+		b.extract(new File("data/img/mirflickr/im10011.jpg"));
+		
 		
 	}
 }
