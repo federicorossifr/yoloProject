@@ -28,7 +28,7 @@ public class SeqImageStorage {
 
 		File[] img_files = imgFolder.listFiles();
 		//File[] meta_files = metaFolder.listFiles();
-		
+
 		DNNExtractor extractor = new DNNExtractor();
 
 		// for each image
@@ -48,7 +48,7 @@ public class SeqImageStorage {
 					float[] features = extractor.extract(bb_mat.get(bb_index), Parameters.DEEP_LAYER);
 					time += System.currentTimeMillis();
 					System.out.println(time);
-					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_list.get(bb_index)));
+					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_list.get(bb_index), dimg.serializeHumanTags()));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

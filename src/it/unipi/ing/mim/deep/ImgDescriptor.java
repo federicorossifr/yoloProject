@@ -15,11 +15,13 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	
 	private int[] boundingBox;
 	
+	private String human_tags;
+
 	public ImgDescriptor(float[] features, String id) {
-		this(features, id, null);
+		this(features, id, null, "");
 	}
 	
-	public ImgDescriptor(float[] features, String id, int[] boundingBox) {
+	public ImgDescriptor(float[] features, String id, int[] boundingBox, String human_tags) {
 		if (features != null) {
 			float norm2 = evaluateNorm2(features);
 			this.normalizedVector = getNormalizedVector(features, norm2);
@@ -29,6 +31,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 			throw new IllegalArgumentException("Bounding box array size is not 4");
 		this.setBoundingBox(boundingBox);
 
+		this.setHumanTags(human_tags);
 		this.id = id;
 	}
 	
@@ -50,6 +53,14 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	public void setBoundingBox(int[] boundingBox) {
 		this.boundingBox = boundingBox;
+	}
+
+	public String getHumanTags() {
+		return human_tags;
+	}
+
+	public void setHumanTags(String human_tags) {
+		this.human_tags = human_tags;
 	}
 
 	public double getDist() {
