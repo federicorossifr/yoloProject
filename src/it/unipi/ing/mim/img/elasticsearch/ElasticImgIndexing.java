@@ -89,8 +89,8 @@ public class ElasticImgIndexing implements AutoCloseable {
 			client.index(req, RequestOptions.DEFAULT);
 
 			i++;
-			if(i==1000)
-				break;
+			//if(i==1000)
+			//	break;
 		}
 	}
 	
@@ -108,7 +108,7 @@ public class ElasticImgIndexing implements AutoCloseable {
 		jMap.put(Fields.BOUNDING_BOX, detImg.serializeBoundingBoxes().get(bb_index));
 		
 		// Human tags are stored in DetailedImage
-		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags());
+		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags().replace(","," "));
 
 		// Remaining fields are stored in ImgDescriptor
 		jMap.put(Fields.IMG_ID, imgDesc.getId());		
