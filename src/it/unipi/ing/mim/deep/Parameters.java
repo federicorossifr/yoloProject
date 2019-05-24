@@ -39,7 +39,7 @@ public class Parameters {
 	public static final int TOP_K_QUERY = 10;
 	
 	//Lucene Index
-	public static final String INDEX_NAME = "deep";
+	public static final String INDEX_NAME = "yolohybrid";
 	
 	//HTML Output Parameters
 	public static final  String BASE_URI = "file:///" + Parameters.SRC_FOLDER.getAbsolutePath() + "/";

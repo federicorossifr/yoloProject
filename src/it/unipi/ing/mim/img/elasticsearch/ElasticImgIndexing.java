@@ -19,6 +19,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.Settings.Builder;
 
+import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
@@ -34,7 +35,7 @@ public class ElasticImgIndexing implements AutoCloseable {
 		
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
-			//esImgIdx.createIndex();
+			esImgIdx.createIndex();
 			esImgIdx.index();	
 		}
 	}
@@ -55,32 +56,58 @@ public class ElasticImgIndexing implements AutoCloseable {
 	
 	//TODO
 	public void createIndex() throws IOException {
+		//Create the Elasticsearch index
 		IndicesClient idx = client.indices();
-		CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME);
-		Builder s = Settings.builder().put("index.number_of_shards",1);
+		CreateIndexRequest request = new CreateIndexRequest(Parameters.INDEX_NAME);
+		Builder s = Settings.builder()
+				.put("index.number_of_shards",1)
+				.put("number_of_replicas",0)
+				.put("analysis.analyzer.first.type","whitespace");
 		request.settings(s);
-		idx.create(request,RequestOptions.DEFAULT);
+		idx.create(request, RequestOptions.DEFAULT);
 	}
 	
 	//TODO
 	public void index() throws IOException {
 		//LOOP
 			//index all dataset features into Elasticsearch
-		for(ImgDescriptor l: imgDescDataset) {
-			String f2t = pivots.features2Text(l, topKIdx);
-			IndexRequest req = composeRequest(l.getId(), f2t);
-			client.index(req);
+		int i = 0;
+		for(ImgDescriptor imgDesc: imgDescDataset) {
+			System.out.println("Indexing " + i);
+
+			File imgFile = new File(imgDesc.getId());
+			DetailedImage dimg = new DetailedImage(imgFile,
+					new File(Parameters.META_SRC_FOLDER.getPath() + "/" + DetailedImage.getFileNameWithoutExtension(imgFile) + ".txt"));
+			IndexRequest req = composeRequest(imgDesc, dimg);
+			client.index(req, RequestOptions.DEFAULT);
+
+			i++;
+			if(i==1000)
+				break;
 		}
 	}
 	
 	//TODO
-	private IndexRequest composeRequest(String id, String imgTxt) {			
-		//Initialize and fill IndexRequest Object with Fields.ID and Fields.IMG txt
+	private IndexRequest composeRequest(ImgDescriptor imgDesc, DetailedImage detImg) {
 		IndexRequest request = new IndexRequest(INDEX_NAME,"doc");
 		Map<String,String> jMap = new HashMap<String, String>();
-		jMap.put(Fields.ID,id);
-		jMap.put(Fields.IMG,imgTxt);
+		
+		// ImgDescriptor -> (imgid, boundingboxindex, features (of the single bounding box))
+		// DetailedImage -> (imgid, List<bounding boxes>, human tags)
+
+		// get bb_index from ImgDescriptor and use it to index the bounding box associated
+		// to the feature of ImgDescriptor
+		int bb_index = imgDesc.getBoundingBoxIndex();
+		jMap.put(Fields.BOUNDING_BOX, detImg.serializeBoundingBoxes().get(bb_index));
+		
+		// Human tags are stored in DetailedImage
+		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags());
+
+		// Remaining fields are stored in ImgDescriptor
+		jMap.put(Fields.IMG_ID, imgDesc.getId());		
+		jMap.put(Fields.BOUNDING_BOX_SURROGATE, pivots.features2Text(imgDesc, topKIdx));
 		request.source(jMap);
+
 		return request;
 	}
 }

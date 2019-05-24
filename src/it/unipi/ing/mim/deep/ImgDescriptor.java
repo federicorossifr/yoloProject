@@ -13,25 +13,22 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	
 	private double dist; // used for sorting purposes
 	
-	private int[] boundingBox;
-	
-	private String human_tags;
+	private int boundingBoxIndex; // index for indexing DetailedImage Array
 
 	public ImgDescriptor(float[] features, String id) {
-		this(features, id, null, "");
+		this(features, id, 0);
 	}
 	
-	public ImgDescriptor(float[] features, String id, int[] boundingBox, String human_tags) {
+	public ImgDescriptor(float[] features, String id, int boundingBoxIndex) {
 		if (features != null) {
 			float norm2 = evaluateNorm2(features);
 			this.normalizedVector = getNormalizedVector(features, norm2);
 		}
 
-		if(boundingBox.length != 4 && boundingBox != null)
-			throw new IllegalArgumentException("Bounding box array size is not 4");
-		this.setBoundingBox(boundingBox);
+		if(boundingBoxIndex < 0)
+			throw new IllegalArgumentException("Bounding box array size is invalid");
+		this.setBoundingBoxIndex(boundingBoxIndex);
 
-		this.setHumanTags(human_tags);
 		this.id = id;
 	}
 	
@@ -47,20 +44,12 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		this.id = id;
 	}
 	
-	public int[] getBoundingBox() {
-		return boundingBox;
+	public int getBoundingBoxIndex() {
+		return boundingBoxIndex;
 	}
 
-	public void setBoundingBox(int[] boundingBox) {
-		this.boundingBox = boundingBox;
-	}
-
-	public String getHumanTags() {
-		return human_tags;
-	}
-
-	public void setHumanTags(String human_tags) {
-		this.human_tags = human_tags;
+	public void setBoundingBoxIndex(int BoundingBoxIndex) {
+		this.boundingBoxIndex = BoundingBoxIndex;
 	}
 
 	public double getDist() {

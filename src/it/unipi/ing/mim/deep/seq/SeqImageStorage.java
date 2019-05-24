@@ -37,18 +37,18 @@ public class SeqImageStorage {
 			
 			try {
 				DetailedImage dimg = new DetailedImage(img_files[i],
-						new File(metaFolder.getPath() + "/" + getFileNameWithoutExtension(img_files[i]) + ".txt"));
-				ArrayList<int[]> bb_list = dimg.getBoundingBoxes();
+						new File(metaFolder.getPath() + "/" + DetailedImage.getFileNameWithoutExtension(img_files[i]) + ".txt"));
+				//ArrayList<int[]> bb_list = dimg.getBoundingBoxes();
 				ArrayList<Mat> bb_mat = dimg.getRegionsOfInterest();
 
 				// for each image bounding box
-				for(int bb_index=0; bb_index<bb_list.size(); bb_index++) {
-					System.out.println("Bounding box " + bb_index + "/" + bb_list.size());
+				for(int bb_index=0; bb_index<bb_mat.size(); bb_index++) {
+					System.out.println("Bounding box " + bb_index + "/" + bb_mat.size());
 					long time = -System.currentTimeMillis();
 					float[] features = extractor.extract(bb_mat.get(bb_index), Parameters.DEEP_LAYER);
 					time += System.currentTimeMillis();
 					System.out.println(time);
-					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_list.get(bb_index), dimg.serializeHumanTags()));
+					descs.add(new ImgDescriptor(features, img_files[i].getName(), bb_index));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -56,10 +56,5 @@ public class SeqImageStorage {
 		}
 		
 		return descs;	
-	}
-
-	private String getFileNameWithoutExtension(File file) {
-		String filename = file.getName();
-		return filename.substring(0, filename.length()-4);
 	}
 }

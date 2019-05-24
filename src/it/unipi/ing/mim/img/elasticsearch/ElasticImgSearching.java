@@ -93,7 +93,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		//LOOP to fill res
 			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
 		for(int i = 0; i < hits.length; ++i) {
-			String id = (String)hits[i].getSourceAsMap().get(Fields.ID);
+			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			//STEP 1: ImgDescriptor im = new ImgDescriptor(null,id);
 			//STEP 2:
 			ImgDescriptor im = imgDescMap.get(id);
@@ -107,7 +107,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	private SearchRequest composeSearch(String query, int k) {
 		//Initialize SearchRequest and set query and k
 		SearchRequest searchRequest = null;
-		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.IMG);
+		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.BOUNDING_BOX_SURROGATE);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
 		sb.query(qb);
 		sb.size(k);
