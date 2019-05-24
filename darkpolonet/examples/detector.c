@@ -584,7 +584,9 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     if (fp == NULL) exit(EXIT_FAILURE);
     while(1){
         if(filename){
-            strncpy(input, filename, 256);
+            line = buff;
+            strncpy(line, filename, 256);
+            strcpy(curr_fname,line+22);
         } else {
             //../data/img/mirflickr/
             fflush(stdout);
@@ -616,18 +618,18 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes);
         free_detections(dets, nboxes);
         if(outfile){
-            //save_image(im, outfile);
+            save_image(im, outfile);
         }
         else{
-            //save_image(im, "predictions");
+            save_image(im, "predictions");
 #ifdef OPENCV
-            //make_window("predictions", 512, 512, 0);
-            //show_image(im, "predictions", 0);
+            make_window("predictions", 512, 512, 0);
+            show_image(im, "predictions", 0);
 #endif
         }
 
-        //free_image(im);
-        //free_image(sized);
+        free_image(im);
+        free_image(sized);
         if (filename) break;
     }
 }
