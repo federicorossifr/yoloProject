@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
+
 
 public class Pivots {
 	
@@ -28,7 +30,7 @@ public class Pivots {
 	}
 	
 	//TODO
-	public static List	<ImgDescriptor> makeRandomPivots(List<ImgDescriptor> ids, int nPivs) {
+	public static List<ImgDescriptor> makeRandomPivots(List<ImgDescriptor> ids, int nPivs) {
 		ArrayList<ImgDescriptor> pivots = new ArrayList<>();
 
 		//LOOP
@@ -36,6 +38,44 @@ public class Pivots {
 		Collections.shuffle(ids);
 		for(int i = 0; i < nPivs; ++i)
 			pivots.add(ids.get(i));		
+		return pivots;
+	}
+	
+	public static List<ImgDescriptor> make3MPivots(List<ImgDescriptor> ids, int nPivs){
+		int MMM = 3*nPivs;
+		int nSelectedPivs = 0;
+		ArrayList<ImgDescriptor> candidateSet = new ArrayList<>();
+		ArrayList<ImgDescriptor> pivots = new ArrayList<>();
+		ListIterator<ImgDescriptor> it = ids.listIterator();
+		
+		double maxD = -1;
+		int idMax = -1;
+		
+		// Insert at most 3*m random object in the candidate set
+		Collections.shuffle(ids);
+		for(int i=0; i<MMM && it.hasNext(); i++) {
+			candidateSet.add(it.next());
+		}
+		
+		//first pivot is random
+		pivots.add(candidateSet.get(0));
+		candidateSet.remove(0);
+		nSelectedPivs++;
+		
+		while( nSelectedPivs<nPivs && candidateSet.size()>0 ) {
+			for(ImgDescriptor p : pivots) {
+				for(int j=0; j<candidateSet.size(); j++) {
+					if( p.distance(candidateSet.get(j)) > maxD ) {
+						maxD = p.distance(candidateSet.get(j));
+						idMax = j;
+					}
+				}
+			}
+			pivots.add(candidateSet.get(idMax));
+			candidateSet.remove(idMax);
+			maxD=-1; idMax=-1;
+		}
+		
 		return pivots;
 	}
 	
