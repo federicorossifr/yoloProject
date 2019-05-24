@@ -21,6 +21,7 @@ import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
  *
  */
 public class DetailedImage {
+	private String imageID;
 	private ArrayList<String> classNames = new ArrayList<>();
 	private ArrayList<int[]> boundingBoxes = new ArrayList<>();
 	private String[] humanTags;
@@ -39,6 +40,7 @@ public class DetailedImage {
 	 * @throws IOException
 	 */
 	public DetailedImage(File imageFile,File yoloMetaData) throws IOException {
+		imageID = imageFile.getName();
 		FileReader metaReader = new FileReader(yoloMetaData);
 		BufferedReader metaBuferedReader = new BufferedReader(metaReader);
 		String metaLine = "";
@@ -51,12 +53,8 @@ public class DetailedImage {
 			String[] coords = splittedYoloData[splittedYoloData.length-1].split(",");
 			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();			
 			//From first element to the n-1 element there are class-names, for the bounding box.
-			for(int i = 0; i < splittedYoloData.length -1; ++i) {
-				System.out.println("Found class: "+splittedYoloData[i]+" in: "+splittedYoloData[splittedYoloData.length-1]);				
-				classNames.add(splittedYoloData[i]);
-				boundingBoxes.add(intCoords);
-
-			}
+			classNames.add(splittedYoloData[0]);
+			boundingBoxes.add(intCoords);
 			//Second element is a list of int-coordinates
 
 		}
@@ -79,6 +77,7 @@ public class DetailedImage {
 	 * @param tags list of human tags
 	 */
 	public DetailedImage(String imageID,ArrayList<String> bboxes,String[] classes,String[] tags) {
+		this.imageID=imageID;
 		for(String b:bboxes) {
 			String[] coords = b.split(",");
 			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();		
@@ -96,6 +95,7 @@ public class DetailedImage {
 	 * @param tags set of human tags
 	 */
 	public DetailedImage(String imageID,String[] tags) {
+		this.imageID=imageID;
 		String imagePath = Parameters.SRC_FOLDER+File.pathSeparator+imageID;
 		content = imread(imagePath);
 		humanTags = tags;
@@ -140,6 +140,14 @@ public class DetailedImage {
 	
 	public String[] humanTags() {
 		return humanTags;
+	}
+	
+	public String getClassByIndex(int i) {
+		return classNames.get(i);
+	}
+	
+	public int[] getBoundingBoxByIndex(int i) {
+		return boundingBoxes.get(i);
 	}
 	
 	/**
