@@ -25,7 +25,8 @@ public class Pivots {
 
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		List<ImgDescriptor> ids = FeaturesStorage.load(Parameters.STORAGE_FILE);
-		List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
+		//List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
+		List<ImgDescriptor> pivs = Pivots.make3MPivots(ids, Parameters.NUM_PIVOTS);
 		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE);
 	}
 	
@@ -71,9 +72,11 @@ public class Pivots {
 					}
 				}
 			}
+			System.out.println("pivots selected id="+idMax+" dist="+maxD);
 			pivots.add(candidateSet.get(idMax));
 			candidateSet.remove(idMax);
 			maxD=-1; idMax=-1;
+			nSelectedPivs++;
 		}
 		
 		return pivots;
