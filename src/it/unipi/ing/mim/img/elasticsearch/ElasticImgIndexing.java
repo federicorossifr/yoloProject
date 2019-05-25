@@ -106,7 +106,10 @@ public class ElasticImgIndexing implements AutoCloseable {
 		// to the feature of ImgDescriptor
 		int bb_index = imgDesc.getBoundingBoxIndex();
 		jMap.put(Fields.BOUNDING_BOX, detImg.serializeBoundingBoxes().get(bb_index));
-		
+
+		// Class related to the bounding box
+		jMap.put(Fields.CLASS_NAME,detImg.getClassByIndex(bb_index));
+
 		// Human tags are stored in DetailedImage
 		jMap.put(Fields.FLICKR_TAGS, detImg.serializeHumanTags().replace(","," "));
 
