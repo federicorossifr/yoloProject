@@ -7,9 +7,9 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private float[] normalizedVector; // image feature
+	private float[] normalizedVector; // bounding box image feature
 	
-	private String id; // unique id of the image (usually file name)
+	private String id; // unique id of the image (file name)
 	
 	private double dist; // used for sorting purposes
 	
@@ -48,8 +48,8 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return boundingBoxIndex;
 	}
 
-	public void setBoundingBoxIndex(int BoundingBoxIndex) {
-		this.boundingBoxIndex = BoundingBoxIndex;
+	public void setBoundingBoxIndex(int boundingBoxIndex) {
+		this.boundingBoxIndex = boundingBoxIndex;
 	}
 
 	public double getDist() {
