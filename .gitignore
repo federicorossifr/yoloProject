@@ -1,5 +1,8 @@
 .metadata
-#data/
+data/img/mirflickr
+data/img/img
+data/caffe
+data/img/meta
 bin/
 tmp/
 out/
