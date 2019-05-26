@@ -240,7 +240,11 @@ image **load_alphabet()
 void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
     int i,j;
-
+    char outPath[512];
+    sprintf(outPath,"../data/img/meta/%s.txt",curr_fname);
+    printf("Opening file: %s",outPath);
+    FILE* fp = fopen(outPath,"w");
+    if(!fp) printf("Null\n");
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
@@ -291,13 +295,8 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
             // HERE WE HAVE THE BBOX
-            char outPath[256];
-            sprintf(outPath,"../data/img/extracted/%s.txt",curr_fname);
-            FILE* fp = fopen(outPath,"w");
+            printf("%s,%d,%d,%d,%d\n",labelstr,left,right,top,bot);
             fprintf(fp,"%s;%d,%d,%d,%d\n",labelstr,left,right,top,bot);
-            fflush(fp);
-            fclose(fp);
-            printf("%s,%d,%d,%d,%d\n%s\n",labelstr,left,right,top,bot,outPath);
             //MY JOB IS DONE HERE, I can go
             //
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
@@ -317,6 +316,8 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             }
         }
     }
+    fflush(fp);
+    fclose(fp);
 }
 
 void transpose_image(image im)
