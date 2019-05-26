@@ -26,7 +26,6 @@ public class DetailedImage {
 	private ArrayList<int[]> boundingBoxes = new ArrayList<>();
 	private String[] humanTags;
 	private Mat content;
-	private double dist; // used for sorting purposes
 
 	/*
 
@@ -199,14 +198,5 @@ public class DetailedImage {
 	public static String getFileNameWithoutExtension(String fileStr) {
 		return fileStr.substring(0, fileStr.length()-4);
 	}
-	public double getDist() {
-		return dist;
-	}
-	public void setDist(double dist) {
-		this.dist=dist;
-	}
-	public String getId() {
-		return imageID;
-	}
-
+		
 }

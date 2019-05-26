@@ -12,7 +12,7 @@ public class Output {
 
 	public static final int COLUMNS = 5;
 
-	public static void toHTML(List<DetailedImage> ids, String baseURI, File outputFile) {
+	public static void toHTML(List<ImgDescriptor> ids, String baseURI, File outputFile) {
 		String html = "<html>\n<body>\n<table align='center'>\n";
 
 		for (int i = 0; i < ids.size(); i++) {
