@@ -23,6 +23,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
+import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
@@ -40,7 +41,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
 			//Image Query File
-			File imgQuery = new File(Parameters.SRC_FOLDER, "000000007816.jpg");
+			File imgQuery = new File(Parameters.SRC_FOLDER, "im121.jpg");
 			
 			DNNExtractor extractor = new DNNExtractor();
 			
@@ -49,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			
@@ -78,13 +79,34 @@ public class ElasticImgSearching implements AutoCloseable {
 	}
 	
 	//TODO
+	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
+		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
+		SearchRequest sr = composeSearch(queryF, k,Fields.CLASS_NAME);
+		//perform elasticsearch search
+		@SuppressWarnings("deprecation")
+		SearchResponse searchResponse = client.search(sr);
+		SearchHit[] hits = searchResponse.getHits().getHits();
+
+		//LOOP to fill res
+			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
+		for(int i = 0; i < hits.length; ++i) {
+			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
+			
+			//STEP 1: ImgDescriptor im = new ImgDescriptor(null,id);
+			//STEP 2:
+			ImgDescriptor im = imgDescMap.get(id);
+			im.setDist(hits[i].getScore());
+			res.add(im);
+		}
+		return res;
+	}
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		//call composeSearch to get SearchRequest object
-		SearchRequest sr = composeSearch(f2t, k);
+		SearchRequest sr = composeSearch(f2t, k,Fields.BOUNDING_BOX_FEAT);
 		//perform elasticsearch search
 		@SuppressWarnings("deprecation")
 		SearchResponse searchResponse = client.search(sr);
@@ -103,11 +125,12 @@ public class ElasticImgSearching implements AutoCloseable {
 		return res;
 	}
 	
+	
 	//TODO
-	private SearchRequest composeSearch(String query, int k) {
+	private SearchRequest composeSearch(String query, int k, String field) {
 		//Initialize SearchRequest and set query and k
 		SearchRequest searchRequest = null;
-		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.BOUNDING_BOX_FEAT);
+		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, field);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
 		sb.query(qb);
 		sb.size(k);
