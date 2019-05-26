@@ -85,24 +85,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		//perform elasticsearch search
 		@SuppressWarnings("deprecation")
 		SearchResponse searchResponse = client.search(sr);
-		SearchHit[] hits = searchResponse.getHits().getHits();
-
-		//LOOP to fill res
-			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
-		for(int i = 0; i < hits.length; ++i) {
-			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
-			
-			//STEP 1: ImgDescriptor im = new ImgDescriptor(null,id);
-			//STEP 2:
-			ImgDescriptor im = imgDescMap.get(id);
-			im.setDist(hits[i].getScore());
-			res.add(im);
-		}
-		return res;
+		return performSearch(searchResponse);
 	}
-	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{
-		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
-		
+	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		//call composeSearch to get SearchRequest object
@@ -110,8 +95,11 @@ public class ElasticImgSearching implements AutoCloseable {
 		//perform elasticsearch search
 		@SuppressWarnings("deprecation")
 		SearchResponse searchResponse = client.search(sr);
+		return performSearch(searchResponse);
+	}
+	private List<ImgDescriptor> performSearch(SearchResponse searchResponse) {
+		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
-
 		//LOOP to fill res
 			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
 		for(int i = 0; i < hits.length; ++i) {
@@ -121,10 +109,9 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor im = imgDescMap.get(id);
 			im.setDist(hits[i].getScore());
 			res.add(im);
-		}
+		}	
 		return res;
 	}
-	
 	
 	//TODO
 	private SearchRequest composeSearch(String query, int k, String field) {
