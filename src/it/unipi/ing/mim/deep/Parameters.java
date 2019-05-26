@@ -27,7 +27,7 @@ public class Parameters {
 	public static final int K = 30;
 	
 	//Pivots File
-	public static final File  PIVOTS_FILE = new File("out/deep.pivots.dat");
+	public static final File  PIVOTS_FILE = new File("data/deep.pivots.dat");
 	
 	//Number Of Pivots
 	public static final int NUM_PIVOTS = 100;

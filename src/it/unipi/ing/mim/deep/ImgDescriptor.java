@@ -25,7 +25,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 			this.normalizedVector = getNormalizedVector(features, norm2);
 		}
 
-		if(boundingBoxIndex < 0)
+		if(boundingBoxIndex < 0 && boundingBoxIndex != -1)
 			throw new IllegalArgumentException("Bounding box array size is invalid");
 		this.setBoundingBoxIndex(boundingBoxIndex);
 
