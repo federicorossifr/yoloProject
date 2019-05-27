@@ -70,6 +70,11 @@ public class DetailedImage {
 		metaReader.close();
 	}
 	
+	/**
+	 * Shorthand constructor with only the image ID as parameter
+	 * @param imageID
+	 * @throws IOException
+	 */
 	public DetailedImage(String imageID) throws IOException {
 		this(new File(Parameters.SRC_FOLDER+File.separator+imageID),
 			 new File(Parameters.META_SRC_FOLDER+File.separator+getFileNameWithoutExtension(imageID)+".txt"));

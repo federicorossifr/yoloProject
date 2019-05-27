@@ -20,6 +20,14 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 public class ImageUtils {
+	
+	/**
+	 * Method to get a JavaFX image from an ImageDescriptor, with the relative bouding
+	 * box, (if any) applied.
+	 * @param i
+	 * @return
+	 * @throws IOException
+	 */
 	public static Image getDrawable(ImgDescriptor i) throws IOException {
 		DetailedImage di = new DetailedImage(i.getId());
 		Mat imageContent = di.getContent();
@@ -32,7 +40,12 @@ public class ImageUtils {
 		return matToImage(imageContent);
 	}
 	
-	public static Image matToImage(Mat m) {
+	/**
+	 * Method to convert an OpenCV image matrix to a JavaFX Image via BufferedImage
+	 * @param m
+	 * @return
+	 */
+	private static Image matToImage(Mat m) {
 		int width = m.cols();
 		int height = m.rows();
 		int depth = m.channels();
@@ -42,7 +55,13 @@ public class ImageUtils {
 		return SwingFXUtils.toFXImage(img, null);
 	}
 	
-	public static Rect getRectFromCorners(int[] bbox) {
+	
+	/**
+	 * Method to build an OpenCV rectangle from the four corners of a bounding box
+	 * @param bbox
+	 * @return
+	 */
+	private static Rect getRectFromCorners(int[] bbox) {
 		int left=bbox[0],right=bbox[1],top=bbox[2],bottom=bbox[3];
 		// OpenCv ROIs want top-left corner and width,height of the rectangle
 		int width = Math.abs(right-left);
@@ -52,7 +71,6 @@ public class ImageUtils {
 	}
 	
 
-	
 	public static void main(String[] args) throws IOException {
 			Image m = getDrawable(new ImgDescriptor(null,"im10001.jpg",0));
 	}
