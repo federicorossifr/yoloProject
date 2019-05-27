@@ -86,6 +86,7 @@ public class YoloGUI extends Application {
 			
 			List<ImgDescriptor> searched = null;
 			ArrayList<Image> imageTemp = new ArrayList<Image>();
+			imageResults.getChildren().clear();
 			
 			if(!humanTags.getText().equals("")) {
 				searched = tagSearch(humanTags.getText());
@@ -103,7 +104,7 @@ public class YoloGUI extends Application {
 				}
 			}
 			
-			 int cols=7, colCnt = 0, rowCnt = 0;
+			 int cols=6, colCnt = 0, rowCnt = 0;
 			 for (int i=0; i<imageTemp.size(); i++) {
 			    	ImageView imgIn = new ImageView(imageTemp.get(i));
 			    	imgIn.setFitHeight(200);
