@@ -54,8 +54,13 @@ public class Pivots {
 		
 		// Insert at most 3*m random object in the candidate set
 		Collections.shuffle(ids);
-		for(int i=0; i<MMM && it.hasNext(); i++) {
-			candidateSet.add(it.next());
+		int ins=0;
+		while( ins<MMM && it.hasNext() ) {
+			ImgDescriptor d = it.next();
+			if( d.getBoundingBoxIndex() != -1 ) {
+				candidateSet.add(it.next());
+				ins++;
+			}
 		}
 		
 		//first pivot is random
@@ -72,13 +77,13 @@ public class Pivots {
 					}
 				}
 			}
-			System.out.println("pivots selected id="+idMax+" dist="+maxD);
+			//System.out.println("pivots selected id="+idMax+" dist="+maxD);
 			pivots.add(candidateSet.get(idMax));
 			candidateSet.remove(idMax);
 			maxD=-1; idMax=-1;
 			nSelectedPivs++;
 		}
-		
+		System.out.println("PIVOTS SELECTED");
 		return pivots;
 	}
 	
