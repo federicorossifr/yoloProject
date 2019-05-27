@@ -35,7 +35,7 @@ public class ElasticImgIndexing implements AutoCloseable {
 		
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
-			esImgIdx.deleteIndex();
+			try {esImgIdx.deleteIndex();} catch(Exception e) { System.out.println("Cannot create index"); }
 			esImgIdx.createIndex();
 			esImgIdx.index();	
 		}

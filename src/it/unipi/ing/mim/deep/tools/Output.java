@@ -1,5 +1,6 @@
 package it.unipi.ing.mim.deep.tools;
 
+import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 
 import java.io.File;

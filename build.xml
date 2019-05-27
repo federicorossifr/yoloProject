@@ -87,6 +87,7 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
             <exclude name="**/YoloGUI.java"/>
+            <exclude name="**/BBoxExtractor.java"/>
             <classpath refid="YOLO.classpath"/>
         </javac>
     </target>
@@ -107,6 +108,13 @@
     <target name="SeqImageStorage">
         <java classname="it.unipi.ing.mim.deep.seq.SeqImageStorage" failonerror="true" fork="yes">
             <classpath refid="YOLO.classpath"/>
+            <jvmarg value="-Xmx2G"/>
+        </java>
+    </target>
+    <target name="Pivots">
+        <java classname="it.unipi.ing.mim.img.elasticsearch.Pivots" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+            <jvmarg value="-Xmx2G"/>
         </java>
     </target>
     <target name="TestInference">
@@ -122,6 +130,12 @@
     <target name="SeqImageSearch">
         <java classname="it.unipi.ing.mim.deep.seq.SeqImageSearch" failonerror="true" fork="yes">
             <classpath refid="YOLO.classpath"/>
+        </java>
+    </target>
+    <target name="ElasticImgIndexing">
+        <java classname="it.unipi.ing.mim.img.elasticsearch.ElasticImgIndexing" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+            <jvmarg value="-Xmx2G"/>
         </java>
     </target>
 </project>
