@@ -103,4 +103,14 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	public String toString() {
 		return  DetailedImage.getFileNameWithoutExtension(id) + "-" + boundingBoxIndex;
 	}
+    @Override
+	public boolean equals(Object v) {
+	     boolean retVal = false;
+	     if (v instanceof ImgDescriptor){
+	    	 ImgDescriptor ptr = (ImgDescriptor) v;
+	         retVal = ptr.id == this.id;
+	     }
+	     return retVal;
+	 }
+
 }

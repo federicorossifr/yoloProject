@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			
@@ -74,11 +74,28 @@ public class ElasticImgSearching implements AutoCloseable {
 	public void close() throws IOException {
 		client.close();
 	}
-
+	// search by tag/class name
 	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
 		SearchResponse searchResponse = getSearchResponse(queryF, k,Fields.CLASS_NAME);
-		List<ImgDescriptor> res =  performSearch(searchResponse);
-		return res;
+		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
+		//perform search by tags and add them if they are not already present with bbox
+		searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
+		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
+		return joinImgDescriptors(resTag, resClass);
+	}
+	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
+		for (ImgDescriptor im: resTag) {
+			if(!resClass.contains(im))
+				resClass.add(im);
+		}
+		return resClass;
+	}
+	//search by example
+	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
+		//convert queryF to text
+		String f2t = pivots.features2Text(queryF, topKSearch);
+		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
+		return performSearch(searchResponse,false);
 	}
 	private SearchResponse getSearchResponse(String queryF,int k,String field) throws IOException{
 		//call composeSearch to get SearchRequest object
@@ -86,13 +103,8 @@ public class ElasticImgSearching implements AutoCloseable {
 		//perform elasticsearch search
 		return client.search(sr);
 	}
-	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
-		//convert queryF to text
-		String f2t = pivots.features2Text(queryF, topKSearch);
-		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
-		return performSearch(searchResponse);
-	}
-	private List<ImgDescriptor> performSearch(SearchResponse searchResponse) {
+
+	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) {
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		//LOOP to fill res
@@ -103,6 +115,8 @@ public class ElasticImgSearching implements AutoCloseable {
 			//STEP 2:
 			ImgDescriptor im = imgDescMap.get(id);
 			im.setDist(hits[i].getScore());
+			if(tags)
+				im.setBoundingBoxIndex(Parameters.NO_BOUNDING_BOX);
 			res.add(im);
 		}	
 		return res;

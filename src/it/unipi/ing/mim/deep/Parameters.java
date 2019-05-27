@@ -24,7 +24,7 @@ public class Parameters {
 	public static final File STORAGE_FILE = new File("data/deep.seq.dat");
 	
 	//k-Nearest Neighbors
-	public static final int K = 30;
+	public static final int K = 200;
 	
 	//Pivots File
 	public static final File  PIVOTS_FILE = new File("data/deep.pivots.dat");
@@ -46,5 +46,7 @@ public class Parameters {
 	public static final File RESULTS_HTML = new File("out/deep.seq.html");
 	public static final File RESULTS_HTML_ELASTIC = new File("out/deep.elastic.html");
 	public static final File RESULTS_HTML_REORDERED = new File("out/deep.reordered.html");
+	//BBOX parameters
+	public static final int NO_BOUNDING_BOX = -1;
 
 }
