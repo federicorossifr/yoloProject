@@ -69,6 +69,12 @@ public class DetailedImage {
 		metaReader.close();
 	}
 	
+	public DetailedImage(String imageID) throws IOException {
+		this(new File(Parameters.SRC_FOLDER+File.separator+imageID),
+			 new File(Parameters.META_SRC_FOLDER+File.separator+getFileNameWithoutExtension(imageID)+".txt"));
+		
+	}
+	
 	/**
 	 * Constructor to build a DetailedImage object from its details as returned from search engine
 	 * @param imageID image id to load the png/jpg
@@ -84,7 +90,7 @@ public class DetailedImage {
 			boundingBoxes.add(intCoords);
 		}
 		classNames = (ArrayList<String>)Arrays.asList(classes);
-		String imagePath = Parameters.SRC_FOLDER+File.pathSeparator+imageID;
+		String imagePath = Parameters.SRC_FOLDER+File.separator+imageID;
 		content = imread(imagePath);
 		humanTags = tags;
 	}
@@ -96,7 +102,7 @@ public class DetailedImage {
 	 */
 	public DetailedImage(String imageID,String[] tags) {
 		this.imageID=imageID;
-		String imagePath = Parameters.SRC_FOLDER+File.pathSeparator+imageID;
+		String imagePath = Parameters.SRC_FOLDER+File.separator+imageID;
 		content = imread(imagePath);
 		humanTags = tags;
 		
