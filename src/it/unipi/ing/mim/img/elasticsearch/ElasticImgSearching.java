@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			
@@ -61,7 +61,13 @@ public class ElasticImgSearching implements AutoCloseable {
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
 		}
 	}
-	
+	/**
+	 * Constructor for elastic image searching
+	 * @param pivotsFile
+	 * @param topKSearch
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	public ElasticImgSearching(File pivotsFile, int topKSearch) throws ClassNotFoundException, IOException {
 		pivots = new Pivots(pivotsFile);
 		this.topKSearch = topKSearch;
@@ -74,7 +80,15 @@ public class ElasticImgSearching implements AutoCloseable {
 	public void close() throws IOException {
 		client.close();
 	}
-	// search by tag/class name
+	/**
+	 * Image search by class name and afterwards by tag
+	 * @param queryF
+	 * @param k
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
 		SearchResponse searchResponse = getSearchResponse(queryF, k,Fields.CLASS_NAME);
 		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
@@ -83,6 +97,15 @@ public class ElasticImgSearching implements AutoCloseable {
 		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
 		return joinImgDescriptors(resTag, resClass);
 	}
+	/**
+	 * Image search by class name and afterwards by tag, matches by tag are not added if already present
+	 * @param queryF
+	 * @param k
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
 		for (ImgDescriptor im: resTag) {
 			if(!resClass.contains(im))
@@ -90,42 +113,61 @@ public class ElasticImgSearching implements AutoCloseable {
 		}
 		return resClass;
 	}
-	//search by example
+	/**
+	 * Image search by example
+	 * @param queryF
+	 * @param k
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
 		return performSearch(searchResponse,false);
 	}
+	/**
+	 * call composeSearch to get SearchRequest object and perform elasticsearch search
+	 * @param queryF
+	 * @param k
+	 * @param field
+	 * @return
+	 * @throws IOException
+	 */
 	private SearchResponse getSearchResponse(String queryF,int k,String field) throws IOException{
-		//call composeSearch to get SearchRequest object
 		SearchRequest sr = composeSearch(queryF, k,field);
-		//perform elasticsearch search
 		return client.search(sr);
 	}
-
+    /**
+     * for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score and add it to list of ImgDescritpor
+     * @param searchResponse
+     * @param tags
+     * @return
+     */
 	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) {
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
-		//LOOP to fill res
-			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
 		for(int i = 0; i < hits.length; ++i) {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
-			//STEP 1: ImgDescriptor im = new ImgDescriptor(null,id);
-			//STEP 2:
 			ImgDescriptor im = imgDescMap.get(id);
 			im.setDist(hits[i].getScore());
 			if(tags)
 				im.setBoundingBoxIndex(Parameters.NO_BOUNDING_BOX);
+			System.out.println("Adding img: "+id);
 			res.add(im);
 		}	
 		return res;
 	}
-	private String[] parseTags(Object tags) {
-		return tags.toString().split("\\s+");
-	}
+	/**
+	 * Initialize SearchRequest and set query and k
+	 * @param query
+	 * @param k
+	 * @param field
+	 * @return
+	 */
 	private SearchRequest composeSearch(String query, int k, String field) {
-		//Initialize SearchRequest and set query and k
 		SearchRequest searchRequest = null;
 		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, field);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
@@ -136,10 +178,15 @@ public class ElasticImgSearching implements AutoCloseable {
 		searchRequest.source(sb);
 	    return searchRequest;
 	}
-	
+	/**
+	 * for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
+	 * @param queryF
+	 * @param res
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public List<ImgDescriptor> reorder(ImgDescriptor queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
-		//LOOP
-		//for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
 		for(ImgDescriptor r:res) r.distance(queryF);
 		Collections.sort(res);
 		return res;
