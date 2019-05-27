@@ -44,10 +44,11 @@ public class SeqImageStorage {
 				long time = -System.currentTimeMillis();
 
 				// entry for the main image
-				System.out.println("Bounding box base");
-				float[] features_img = extractor.extract(dimg.getContent(), Parameters.DEEP_LAYER);
-				descs.add(new ImgDescriptor(features_img, img_files[i].getName(), -1));
-
+				if(bb_mat.size()==0) {
+					System.out.println("Bounding box base");
+					float[] features_img = extractor.extract(dimg.getContent(), Parameters.DEEP_LAYER);
+					descs.add(new ImgDescriptor(features_img, img_files[i].getName(), -1));
+				}
 				// otherwise for each image bounding box
 				for(int bb_index=0; bb_index<bb_mat.size(); bb_index++) {
 					System.out.println("Bounding box " + bb_index + "/" + bb_mat.size());
