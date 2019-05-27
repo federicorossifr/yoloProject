@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			
@@ -62,7 +62,6 @@ public class ElasticImgSearching implements AutoCloseable {
 		}
 	}
 	
-	//TODO
 	public ElasticImgSearching(File pivotsFile, int topKSearch) throws ClassNotFoundException, IOException {
 		pivots = new Pivots(pivotsFile);
 		this.topKSearch = topKSearch;
@@ -72,29 +71,25 @@ public class ElasticImgSearching implements AutoCloseable {
 		imgDescMap = new HashMap<String, ImgDescriptor>();
 		for(ImgDescriptor ll:l) imgDescMap.put(ll.getId(), ll);
 	}
-	
-	//TODO
 	public void close() throws IOException {
 		client.close();
 	}
-	
-	//TODO
+
 	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
-		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
-		SearchRequest sr = composeSearch(queryF, k,Fields.CLASS_NAME);
+		SearchResponse searchResponse = getSearchResponse(queryF, k,Fields.CLASS_NAME);
+		List<ImgDescriptor> res =  performSearch(searchResponse);
+		return res;
+	}
+	private SearchResponse getSearchResponse(String queryF,int k,String field) throws IOException{
+		//call composeSearch to get SearchRequest object
+		SearchRequest sr = composeSearch(queryF, k,field);
 		//perform elasticsearch search
-		@SuppressWarnings("deprecation")
-		SearchResponse searchResponse = client.search(sr);
-		return performSearch(searchResponse);
+		return client.search(sr);
 	}
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
-		//call composeSearch to get SearchRequest object
-		SearchRequest sr = composeSearch(f2t, k,Fields.BOUNDING_BOX_FEAT);
-		//perform elasticsearch search
-		@SuppressWarnings("deprecation")
-		SearchResponse searchResponse = client.search(sr);
+		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
 		return performSearch(searchResponse);
 	}
 	private List<ImgDescriptor> performSearch(SearchResponse searchResponse) {
@@ -115,7 +110,6 @@ public class ElasticImgSearching implements AutoCloseable {
 	private String[] parseTags(Object tags) {
 		return tags.toString().split("\\s+");
 	}
-	//TODO
 	private SearchRequest composeSearch(String query, int k, String field) {
 		//Initialize SearchRequest and set query and k
 		SearchRequest searchRequest = null;
@@ -129,7 +123,6 @@ public class ElasticImgSearching implements AutoCloseable {
 	    return searchRequest;
 	}
 	
-	//TODO
 	public List<ImgDescriptor> reorder(ImgDescriptor queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
 		//LOOP
 		//for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
