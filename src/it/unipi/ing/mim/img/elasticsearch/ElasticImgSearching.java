@@ -13,7 +13,6 @@ import org.apache.http.HttpHost;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -23,11 +22,13 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
-import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
 import it.unipi.ing.mim.deep.tools.Output;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.status.StatusLogger;
+
 
 public class ElasticImgSearching implements AutoCloseable {
 
@@ -38,10 +39,10 @@ public class ElasticImgSearching implements AutoCloseable {
 	private int topKSearch;
 		
 	public static void main(String[] args) throws Exception {
-		
+		StatusLogger.getLogger().setLevel(Level.OFF);		
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
 			//Image Query File
-			File imgQuery = new File(Parameters.SRC_FOLDER, "im121.jpg");
+			File imgQuery = new File(Parameters.SRC_FOLDER, "im22166.jpg");
 			
 			DNNExtractor extractor = new DNNExtractor();
 			
