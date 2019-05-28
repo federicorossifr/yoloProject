@@ -37,8 +37,8 @@ public class ImageUtils {
 			Rect roi = getRectFromCorners(bboxCoords);
 			rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
 		} 
-		imshow("rect",imageContent);
-		waitKey();
+		/*imshow("rect",imageContent);
+		waitKey();*/
 		return matToImage(imageContent);
 	}
 	
