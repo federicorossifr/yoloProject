@@ -42,7 +42,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		StatusLogger.getLogger().setLevel(Level.OFF);		
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
 			//Image Query File
-			File imgQuery = new File(Parameters.SRC_FOLDER, "im22166.jpg");
+			File imgQuery = new File(Parameters.SRC_FOLDER, "im2.jpg");
 			
 			DNNExtractor extractor = new DNNExtractor();
 			
@@ -51,15 +51,15 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
 			
 			//Uncomment for the optional step
-			res = imgSearch.reorder(query, res);
-			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
+			//res = imgSearch.reorder(query, res);
+			//Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
 		}
 	}
 	/**
@@ -127,7 +127,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
-		return performSearch(searchResponse,false);
+		return reorder(queryF,performSearch(searchResponse,false));
 	}
 	/**
 	 * call composeSearch to get SearchRequest object and perform elasticsearch search
@@ -156,7 +156,6 @@ public class ElasticImgSearching implements AutoCloseable {
 			im.setDist(hits[i].getScore());
 			if(tags)
 				im.setBoundingBoxIndex(Parameters.NO_BOUNDING_BOX);
-			System.out.println("Adding img: "+id);
 			res.add(im);
 		}	
 		return res;
@@ -192,4 +191,5 @@ public class ElasticImgSearching implements AutoCloseable {
 		Collections.sort(res);
 		return res;
 	}
+
 }
