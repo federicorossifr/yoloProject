@@ -30,7 +30,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -43,7 +46,6 @@ public class YoloGUI extends Application {
 	
 	private TextField humanTags = new TextField();
 	private TextField topK = new TextField();
-	//private Button openButton = new Button("Open an image");
 	private ImageView img = new ImageView();
 	private Button startSearch = new Button("Start Search");
 	private YoloGridView imageResults = new YoloGridView();
@@ -62,7 +64,21 @@ public class YoloGUI extends Application {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
-
+		
+		ImageView yoloIcon = new ImageView(new Image(new File("data/img/gui/darknet.png").toURI().toString()));
+		ImageView yoloText = new ImageView(new Image(new File("data/img/gui/yologo.png").toURI().toString()));
+		yoloIcon.setFitHeight(100);
+		yoloIcon.setFitWidth(100);
+		yoloIcon.setPreserveRatio(true);
+		yoloText.setFitWidth(150);
+		yoloText.setFitHeight(100);
+		yoloText.setPreserveRatio(true);
+		HBox fooTitle = new HBox(20,yoloIcon, yoloText);
+		HBox topTitle = new HBox(1, new HBox(),fooTitle);
+		topTitle.setStyle("-fx-background-color: #283747;");
+		fooTitle.setAlignment(Pos.CENTER);
+		topTitle.setAlignment(Pos.CENTER);
+		
 		topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
 		
 		Label tagLabel = new Label("Human Tag:");
@@ -74,20 +90,26 @@ public class YoloGUI extends Application {
 		loading.setFitWidth(30);
 		loading.setPreserveRatio(true);
 		loading.setImage(null);
-		HBox searchBox = new HBox(20, startSearch, loading);
+		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
 		
-		VBox inputBox = new VBox(20,hboxTag, topKBox, searchBox);
+		VBox inputBox = new VBox(20,hboxTag, topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
-		VBox imageBox = new VBox(img);
+		Text inftx = new Text("Click Here to Load an Image");
+	    StackPane pane = new StackPane(img, inftx);
+	    pane.setAlignment(Pos.CENTER);
+	    
+		VBox imageBox = new VBox(pane);
 		imageBox.setAlignment(Pos.CENTER);
-		HBox topPane = new HBox(300, inputBox, imageBox);
-		VBox allPane = new VBox(20, topPane, imageResults);
+
+	    
+		HBox topPane = new HBox(150, inputBox, new VBox(160,new VBox(),searchBox), imageBox);
+		VBox allPane = new VBox(20, topTitle,topPane, imageResults);
 		
 		img.setFitWidth(200);
 		img.setFitHeight(200);
-		img.setPreserveRatio(true);
+		//img.setPreserveRatio(true);
 		imageBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
 		Group root = new Group(allPane);
 		Scene scene = new Scene(root, 1100,800);
@@ -116,12 +138,13 @@ public class YoloGUI extends Application {
 	        	Image i = new Image(openedImage.toURI().toString());
 	        	img.setImage(i);
 	        	
-	        }
+	        }else
+	        	img.setImage(null);
 	    });
 		
-	    startSearch.setStyle("-fx-background-color: linear-gradient(#008CFF, #66B2FF), radial-gradient(center 50% -40%, radius 200%, #008CFF 45%, #66B2FF 50%); -fx-background-radius: 6, 5; "
+	   startSearch.setStyle("-fx-background-color: linear-gradient(#008CFF, #66B2FF), radial-gradient(center 50% -40%, radius 200%, #008CFF 45%, #66B2FF 50%); -fx-background-radius: 6, 5; "
                 + "-fx-background-insets: 0, 1; -fx-text-fill: white;-fx-font-weigth: bold");
-	    
+	   
 		startSearch.setOnAction((ActionEvent ev)-> {
 			
 			loading.setImage(new Image(new File(loadingPath).toURI().toString()));
