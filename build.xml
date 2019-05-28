@@ -88,6 +88,8 @@
             <src path="src"/>
             <exclude name="**/YoloGUI.java"/>
             <exclude name="**/BBoxExtractor.java"/>
+            <exclude name="**/YoloGridView.java"/>
+            <exclude name="**/ImageUtils.java"/>
             <classpath refid="YOLO.classpath"/>
         </javac>
     </target>
@@ -134,6 +136,12 @@
     </target>
     <target name="ElasticImgIndexing">
         <java classname="it.unipi.ing.mim.img.elasticsearch.ElasticImgIndexing" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+            <jvmarg value="-Xmx2G"/>
+        </java>
+    </target>
+    <target name="ElasticImgSearching">
+        <java classname="it.unipi.ing.mim.img.elasticsearch.ElasticImgSearching" failonerror="true" fork="yes">
             <classpath refid="YOLO.classpath"/>
             <jvmarg value="-Xmx2G"/>
         </java>
