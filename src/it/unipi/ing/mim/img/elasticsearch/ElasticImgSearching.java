@@ -33,7 +33,6 @@ import org.apache.logging.log4j.status.StatusLogger;
 public class ElasticImgSearching implements AutoCloseable {
 
 	private RestHighLevelClient client;
-	
 	private Pivots pivots;
 	private Map<String,ImgDescriptor> imgDescMap;
 	private int topKSearch;
@@ -54,14 +53,10 @@ public class ElasticImgSearching implements AutoCloseable {
 			List<ImgDescriptor> res = imgSearch.search("dog", Parameters.K);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
-			
-			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
-			
-			//Uncomment for the optional step
-			//res = imgSearch.reorder(query, res);
-			//Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
+			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
 		}
 	}
+	
 	/**
 	 * Constructor for elastic image searching
 	 * @param pivotsFile
@@ -78,9 +73,11 @@ public class ElasticImgSearching implements AutoCloseable {
 		imgDescMap = new HashMap<String, ImgDescriptor>();
 		for(ImgDescriptor ll:l) imgDescMap.put(ll.getId(), ll);
 	}
+	
 	public void close() throws IOException {
 		client.close();
 	}
+	
 	/**
 	 * Image search by class name and afterwards by tag
 	 * @param queryF
@@ -96,8 +93,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		//perform search by tags and add them if they are not already present with bbox
 		searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
 		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
-		return joinImgDescriptors(resTag, resClass);
+		return reorder(queryF,joinImgDescriptors(resTag, resClass));
 	}
+	
 	/**
 	 * Image search by class name and afterwards by tag, matches by tag are not added if already present
 	 * @param queryF
@@ -114,6 +112,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		}
 		return resClass;
 	}
+	
 	/**
 	 * Image search by example
 	 * @param queryF
@@ -129,8 +128,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
 		return reorder(queryF,performSearch(searchResponse,false));
 	}
+	
 	/**
-	 * call composeSearch to get SearchRequest object and perform elasticsearch search
+	 * Call composeSearch to get SearchRequest object and perform elasticsearch search
 	 * @param queryF
 	 * @param k
 	 * @param field
@@ -141,8 +141,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		SearchRequest sr = composeSearch(queryF, k,field);
 		return client.search(sr);
 	}
+	
     /**
-     * for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score and add it to list of ImgDescritpor
+     * For each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score and add it to list of ImgDescritpor
      * @param searchResponse
      * @param tags
      * @return
@@ -151,6 +152,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		for(int i = 0; i < hits.length; ++i) {
+			System.out.println(hits[i]);
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			ImgDescriptor im = imgDescMap.get(id);
 			im.setDist(hits[i].getScore());
@@ -160,6 +162,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		}	
 		return res;
 	}
+	
 	/**
 	 * Initialize SearchRequest and set query and k
 	 * @param query
@@ -178,8 +181,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		searchRequest.source(sb);
 	    return searchRequest;
 	}
+	
 	/**
-	 * for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
+	 * For each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
 	 * @param queryF
 	 * @param res
 	 * @return
@@ -191,5 +195,17 @@ public class ElasticImgSearching implements AutoCloseable {
 		Collections.sort(res);
 		return res;
 	}
-
+	
+	/**
+	 * Sort the results based on their score, higher is better hence the sort is inverted w.r.t. search by example
+	 * @param queryF
+	 * @param res
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public List<ImgDescriptor> reorder(String queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
+		Collections.sort(res,Collections.reverseOrder());
+		return res;
+	}
 }
