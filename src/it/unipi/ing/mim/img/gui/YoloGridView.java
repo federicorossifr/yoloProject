@@ -20,7 +20,7 @@ public class YoloGridView extends ScrollPane{
 	}
 
 	public YoloGridView() {
-		this(1100,600, 4, 200,10);
+		this(1100,460, 4, 200,10);
 	}
 	
 	public void clearView() {
