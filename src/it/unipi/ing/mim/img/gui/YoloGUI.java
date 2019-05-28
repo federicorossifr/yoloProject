@@ -62,7 +62,9 @@ public class YoloGUI extends Application {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
-	
+
+		topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
+		
 		Label tagLabel = new Label("Human Tag:");
 		Label topKLabel = new Label("Top K-NN: ");
 		HBox hboxTag = new HBox(20,new Label(""),tagLabel, humanTags);
@@ -133,10 +135,10 @@ public class YoloGUI extends Application {
 
 	}
 	
-	private List<ImgDescriptor> tagSearch(String tag) {
+	private List<ImgDescriptor> tagSearch(String tag, int k) {
 		
 		try {
-			return eSearch.search(tag, it.unipi.ing.mim.deep.Parameters.K);
+			return eSearch.search(tag, k);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +155,7 @@ public class YoloGUI extends Application {
 
 	}
 	
-	private List<ImgDescriptor> imageSearch(File image) {
+	private List<ImgDescriptor> imageSearch(File image, int k) {
 		
 		DNNExtractor extractor = new DNNExtractor();
 
@@ -163,7 +165,7 @@ public class YoloGUI extends Application {
 		ImgDescriptor imDes = new ImgDescriptor(imgFeatures, openedImage.getName());
 		
 		try {	
-			return eSearch.search(imDes, it.unipi.ing.mim.deep.Parameters.K );
+			return eSearch.search(imDes,k);
 			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -195,10 +197,45 @@ public class YoloGUI extends Application {
 			ArrayList<Image> imageTemp = new ArrayList<Image>();
 			
 			if(!humanTags.getText().equals("")) {
-				searched = tagSearch(humanTags.getText());
+				
+				if(!topK.getText().equals("")) {
+					
+					int k = Integer.parseInt(topK.getText());
+					if( k > 0)
+						searched = tagSearch(humanTags.getText(), k);
+					else {
+						
+						topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
+						searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
+						
+					}
+					
+				}else{
+					
+					topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
+					searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
+					
+				}
+					
 				
 			}else if(img.getImage() != null) {
-				searched = imageSearch(openedImage);
+				
+				if(!topK.getText().equals("")) {
+					
+					int k = Integer.parseInt(topK.getText());
+					if(k>0)
+						searched = imageSearch(openedImage, k);
+					else {
+						topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
+						searched = imageSearch(openedImage, it.unipi.ing.mim.deep.Parameters.K);
+					}
+					
+				}else{
+					
+					topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
+					searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
+					
+				}
 			}
 			
 			for(ImgDescriptor i : searched) {
