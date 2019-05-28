@@ -25,6 +25,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -39,11 +40,11 @@ import it.unipi.ing.mim.img.elasticsearch.Pivots;
 public class YoloGUI extends Application {
 	
 	private TextField humanTags = new TextField();
-	private Button openButton = new Button("Open an image");
+	private TextField topK = new TextField();
+	//private Button openButton = new Button("Open an image");
 	private ImageView img = new ImageView();
 	private Button startSearch = new Button("Start Search");
-	private GridPane imageResults = new GridPane();
-	private ScrollPane scroll = new ScrollPane();
+	private YoloGridView imageResults = new YoloGridView();
 		
 	private float[] imgFeatures;
 	private File openedImage;
@@ -53,11 +54,31 @@ public class YoloGUI extends Application {
 	@Override
 	public void start(Stage stage) {
 	
-		Label pathLabel = new Label("Insert Human Tag:");
-		HBox hbox = new HBox(20,new Label(""),pathLabel, humanTags );
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
+	
+		Label tagLabel = new Label("Insert Human Tag:");
+		Label topKLabel = new Label("Insert top K-NN: ");
+		HBox hboxTag = new HBox(20,new Label(""),tagLabel, humanTags);
+		HBox topKBox = new HBox(20,new Label(""), topKLabel, topK );
+
+		VBox inputBox = new VBox(10,hboxTag, topKBox, startSearch);
+		
+		VBox imageBox = new VBox(img);
+		HBox topPane = new HBox(300, inputBox, imageBox);
+		VBox allPane = new VBox(20, topPane, imageResults);
+		
+		img.setFitWidth(200);
+		img.setFitHeight(200);
+		img.setPreserveRatio(true);
+		imageBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
+		Group root = new Group(allPane);
+		Scene scene = new Scene(root, 1100,800);
+		stage.setScene(scene);
+		stage.setTitle("Yolo GUI");
+		stage.show();
+		
 		
 		try {
 			
@@ -70,10 +91,10 @@ public class YoloGUI extends Application {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-		openButton.setOnAction((ActionEvent ev) ->{
-			
-			openedImage = fileChooser.showOpenDialog(stage);
+		
+	    imageBox.setOnMouseClicked( (MouseEvent event) ->{
+	    	
+	    	openedImage = fileChooser.showOpenDialog(stage);
 	        if (openedImage != null) {
 	
 	        	Image i = new Image(openedImage.toURI().toString());
@@ -86,7 +107,6 @@ public class YoloGUI extends Application {
 			
 			List<ImgDescriptor> searched = null;
 			ArrayList<Image> imageTemp = new ArrayList<Image>();
-			imageResults.getChildren().clear();
 			
 			if(!humanTags.getText().equals("")) {
 				searched = tagSearch(humanTags.getText());
@@ -104,44 +124,10 @@ public class YoloGUI extends Application {
 				}
 			}
 			
-			 int cols=6, colCnt = 0, rowCnt = 0;
-			 for (int i=0; i<imageTemp.size(); i++) {
-			    	ImageView imgIn = new ImageView(imageTemp.get(i));
-			    	imgIn.setFitHeight(200);
-			    	imgIn.setFitWidth(200);
-			    	imgIn.setPreserveRatio(true);
-			        imageResults.add(imgIn, colCnt, rowCnt);
-			        colCnt++;
-			        if (colCnt>cols) {
-			            rowCnt++;
-			            colCnt=0;
-			        }
-			}
-
+			imageResults.refreshItems(imageTemp);
 			
 		});
-		
-		img.setFitWidth(200);
-		img.setFitHeight(200);
-		img.setPreserveRatio(true);
-		HBox imgBox = new HBox(img);
-		imgBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
 
-		HBox hbox1 = new HBox(20,openButton, imgBox);
-		imageResults.setPadding(new Insets(10,10,10,10));
-		imageResults.setHgap(10);
-		imageResults.setVgap(10);
-		scroll.setContent(imageResults);
-		scroll.setPrefWidth(1500);
-		scroll.setPrefHeight(400);
-		VBox vbox = new VBox(40, hbox, hbox1, startSearch, scroll);
-		Group root = new Group(vbox);
-		Scene scene = new Scene(root, 1500,800);
-		
-		stage.setScene(scene);
-		stage.setTitle("Yolo GUI");
-		stage.show();
-		
 	}
 	
 	private List<ImgDescriptor> tagSearch(String tag) {
