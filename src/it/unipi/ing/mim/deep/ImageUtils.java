@@ -18,7 +18,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-
+import static org.bytedeco.opencv.global.opencv_highgui.*;
 public class ImageUtils {
 	
 	/**
@@ -35,8 +35,10 @@ public class ImageUtils {
 		if(bboxIdx >= 0) {
 			int[] bboxCoords = di.getBoundingBoxByIndex(bboxIdx);
 			Rect roi = getRectFromCorners(bboxCoords);
-			rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1));
+			rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
 		} 
+		imshow("rect",imageContent);
+		waitKey();
 		return matToImage(imageContent);
 	}
 	
