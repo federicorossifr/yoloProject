@@ -41,7 +41,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		StatusLogger.getLogger().setLevel(Level.OFF);		
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
 			//Image Query File
-			File imgQuery = new File(Parameters.SRC_FOLDER, "im2.jpg");
+			File imgQuery = new File(Parameters.SRC_FOLDER, "im10001.jpg");
 			
 			DNNExtractor extractor = new DNNExtractor();
 			
@@ -50,10 +50,10 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("nikon", Parameters.K);
+			List<ImgDescriptor> res = imgSearch.search("car",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
-			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
+			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
 		}
 	}
 	
@@ -71,7 +71,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		client = new RestHighLevelClient(builder);		
 		List<ImgDescriptor> l = FeaturesStorage.load(Parameters.STORAGE_FILE);
 		imgDescMap = new HashMap<String, ImgDescriptor>();
-		for(ImgDescriptor ll:l) imgDescMap.put(ll.getId(), ll);
+		for(ImgDescriptor ll:l) {
+			imgDescMap.put(ll.getId()+String.valueOf(ll.getBoundingBoxIndex()), ll);
+		}
 	}
 	
 	public void close() throws IOException {
@@ -137,6 +139,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("deprecation")
 	private SearchResponse getSearchResponse(String queryF,int k,String field) throws IOException{
 		SearchRequest sr = composeSearch(queryF, k,field);
 		return client.search(sr);
@@ -153,7 +156,8 @@ public class ElasticImgSearching implements AutoCloseable {
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		for(int i = 0; i < hits.length; ++i) {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
-			ImgDescriptor im = imgDescMap.get(id);
+			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
+			ImgDescriptor im = imgDescMap.get(id+bbox_index);
 			im.setDist(hits[i].getScore());
 			if(tags)
 				im.setBoundingBoxIndex(Parameters.NO_BOUNDING_BOX);
