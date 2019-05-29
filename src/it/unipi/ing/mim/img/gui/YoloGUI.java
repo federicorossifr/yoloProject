@@ -11,6 +11,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
@@ -95,14 +97,13 @@ public class YoloGUI extends Application {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-
 		alert.showAndWait();
 		Platform.exit();
 	}
 	
 	@Override
 	public void start(Stage stage) {
-	
+		StatusLogger.getLogger().setLevel(Level.OFF);			
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
@@ -157,6 +158,7 @@ public class YoloGUI extends Application {
 		Scene scene = new Scene(root, 1100,800);
 		stage.setScene(scene);
 		stage.setTitle("Yolo GUI");
+		stage.getIcons().add(new Image(new File("data/img/gui/darknet.png").toURI().toString()));
 		stage.show();
 		
 		
