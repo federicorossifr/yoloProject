@@ -1,9 +1,13 @@
 package it.unipi.ing.mim.img.gui;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +29,14 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -57,6 +64,41 @@ public class YoloGUI extends Application {
 	private File openedImage;
 	
 	private ElasticImgSearching eSearch; 
+	
+	private void showException(Exception ex) {
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("YOLO-GUI");
+		alert.setHeaderText("Sorry, there was an error");
+		alert.setContentText(ex.getMessage());
+
+		// Create expandable Exception.
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		String exceptionText = sw.toString();
+
+		Label label = new Label("The exception stacktrace was:");
+
+		TextArea textArea = new TextArea(exceptionText);
+		textArea.setEditable(false);
+		textArea.setWrapText(true);
+
+		textArea.setMaxWidth(Double.MAX_VALUE);
+		textArea.setMaxHeight(Double.MAX_VALUE);
+		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(label, 0, 0);
+		expContent.add(textArea, 0, 1);
+
+		// Set expandable Exception into the dialog pane.
+		alert.getDialogPane().setExpandableContent(expContent);
+
+		alert.showAndWait();
+		Platform.exit();
+	}
 	
 	@Override
 	public void start(Stage stage) {
@@ -123,10 +165,10 @@ public class YoloGUI extends Application {
 			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY);
 		
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			showException(e);
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			showException(e);
 			e.printStackTrace();
 		}
 		
@@ -163,16 +205,13 @@ public class YoloGUI extends Application {
 		try {
 			return eSearch.search(tag, k);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		}
 
@@ -191,16 +230,13 @@ public class YoloGUI extends Application {
 			return eSearch.search(imDes,k);
 			
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			showException(e);
 			return null;
 		}
 
@@ -265,8 +301,7 @@ public class YoloGUI extends Application {
 				try {
 					imageTemp.add(ImageUtils.getDrawable(i));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					showException(e);
 				}
 			}
 			
