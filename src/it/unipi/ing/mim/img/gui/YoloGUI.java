@@ -95,7 +95,6 @@ public class YoloGUI extends Application {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-
 		alert.showAndWait();
 		Platform.exit();
 	}
@@ -157,6 +156,7 @@ public class YoloGUI extends Application {
 		Scene scene = new Scene(root, 1100,800);
 		stage.setScene(scene);
 		stage.setTitle("Yolo GUI");
+		stage.getIcons().add(new Image(new File("data/img/gui/darknet.png").toURI().toString()));
 		stage.show();
 		
 		
