@@ -64,6 +64,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	// compare with other friends using distances
 	@Override
 	public int compareTo(ImgDescriptor arg0) {
+		if(Double.valueOf(dist).equals(arg0.dist)) return id.compareTo(arg0.id);
 		return Double.valueOf(dist).compareTo(arg0.dist);
 	}
 	
@@ -103,6 +104,10 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	
 	public String toString() {
 		return  DetailedImage.getFileNameWithoutExtension(id) + "-" + boundingBoxIndex;
+	}
+	
+	public static String toString(String id,int boundingBoxIndex) {
+		return DetailedImage.getFileNameWithoutExtension(id) + "-" + boundingBoxIndex;
 	}
     @Override
 	public boolean equals(Object v) {

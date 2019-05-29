@@ -4,6 +4,7 @@ import java.io.File;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
@@ -35,6 +37,9 @@ public class ElasticImgSearching implements AutoCloseable {
 	private RestHighLevelClient client;
 	private Pivots pivots;
 	private Map<String,ImgDescriptor> imgDescMap;
+	
+	private Map<String,ImgDescriptor> resultMap = new HashMap<>();
+	private Map<String,Boolean> presenceMap = new HashMap<>();
 	private int topKSearch;
 		
 	public static void main(String[] args) throws Exception {
@@ -50,7 +55,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("car",5);
+			List<ImgDescriptor> res = imgSearch.search("car",200);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -72,7 +77,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		List<ImgDescriptor> l = FeaturesStorage.load(Parameters.STORAGE_FILE);
 		imgDescMap = new HashMap<String, ImgDescriptor>();
 		for(ImgDescriptor ll:l) {
-			imgDescMap.put(ll.getId()+String.valueOf(ll.getBoundingBoxIndex()), ll);
+			imgDescMap.put(ll.toString(), ll);
 		}
 	}
 	
@@ -81,7 +86,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	}
 	
 	/**
-	 * Image search by class name and afterwards by tag
+	 * Image search by full text tag or class
 	 * @param queryF
 	 * @param k
 	 * @return
@@ -90,33 +95,61 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
-		SearchResponse searchResponse = getSearchResponse(queryF, k,Fields.CLASS_NAME);
-		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
-		//perform search by tags and add them if they are not already present with bbox
-		searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
-		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
-		return reorder(queryF,joinImgDescriptors(resTag, resClass)).subList(0, k);
-	}
-	
-	/**
-	 * Image search by class name and afterwards by tag, matches by tag are not added if already present
-	 * @param queryF
-	 * @param k
-	 * @return
-	 * @throws ParseException
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
-		for (ImgDescriptor im: resTag) {
-			if(!resClass.contains(im))
-				resClass.add(im);
+		resultMap.clear();
+		presenceMap.clear();
+		SearchResponse searchResponse = getSearchResponse(queryF, k);
+		SearchHit[] searchHits = searchResponse.getHits().getHits();
+		for(SearchHit sh: searchHits) {
+			
+			Map<String,Object> hitContent = sh.getSourceAsMap();
+			
+			// Extract information needed to retrieve the ImageDescriptor
+			String id = (String)hitContent.get(Fields.IMG_ID);
+			int bbox_index = Integer.parseInt((String)hitContent.get(Fields.BOUNDING_BOX));
+			String className = (String)hitContent.get(Fields.CLASS_NAME);
+			ImgDescriptor res = imgDescMap.get(ImgDescriptor.toString(id, bbox_index));
+			
+			//Set the "distance" to the score, will order in reverse order
+			res.setDist(sh.getScore());
+			
+			System.out.println(res.getId()+" "+res.getBoundingBoxIndex());
+			
+			//Partial key is used to access the presenceMap
+			String partialKey = res.getId();
+			//Key is used to acccess the resultMap
+			String key = res.toString();
+			// If image is present in one of its form inside the presenceMap
+			if(presenceMap.containsKey(partialKey)) { 
+				//If bounding box exists and matches with the class query
+				if(res.getBoundingBoxIndex() >= 0 && queryF.contains(className)) {
+					//Insert it into resultMap
+					resultMap.put(key,res);
+					//Check if an unbounded image exists in the result
+					//The unbounded image will have -1 as bounding box index
+					String unboundedKey = ImgDescriptor.toString(partialKey, -1);
+					if(resultMap.containsKey(unboundedKey)) {
+						//If present, remove it
+						resultMap.remove(unboundedKey);
+					}
+				// If no bounding box available we skip it
+				} 
+			// If no image with partialKey ID has been inseted so far, insert it 
+			} else { 
+				presenceMap.put(partialKey,true);
+				resultMap.put(key,res);
+			}
 		}
-		return resClass;
+		//The entry set in resultMap is the actual result
+		List<ImgDescriptor> response = new ArrayList<ImgDescriptor>();		
+		response.clear();
+		for(ImgDescriptor r: resultMap.values()) {
+			response.add(r);
+		}
+		return reorder(queryF, response);
 	}
 	
 	/**
-	 * Image search by example
+	 * Image search by example, by extracting fc6 features
 	 * @param queryF
 	 * @param k
 	 * @return
@@ -125,10 +158,19 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{	
-		//convert queryF to text
+		//convert queryF to surrogate text representation
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
-		return reorder(queryF,performSearch(searchResponse,false)).subList(0, k);
+		SearchHit[] searchHits = searchResponse.getHits().getHits();
+		List<ImgDescriptor> response = new ArrayList<ImgDescriptor>();
+		for(SearchHit sh:searchHits) {
+			Map<String,Object> hitContent = sh.getSourceAsMap();			
+			String id = (String)hitContent.get(Fields.IMG_ID);
+			int bbox_index = Integer.parseInt((String)hitContent.get(Fields.BOUNDING_BOX));
+			ImgDescriptor res = imgDescMap.get(ImgDescriptor.toString(id, bbox_index));
+			response.add(res);
+		}
+		return reorder(queryF,response);
 	}
 	
 	/**
@@ -145,28 +187,39 @@ public class ElasticImgSearching implements AutoCloseable {
 		return client.search(sr);
 	}
 	
-    /**
-     * For each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score and add it to list of ImgDescritpor
-     * @param searchResponse
-     * @param tags
-     * @return
-     */
-	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) {
-		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
-		SearchHit[] hits = searchResponse.getHits().getHits();
-		for(int i = 0; i < hits.length; ++i) {
-			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
-			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
-			ImgDescriptor im = imgDescMap.get(id+bbox_index);
-			im.setDist(hits[i].getScore());
-			if(tags) {
-				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
-				res.add(im_app);
-			}
-			else
-				res.add(im);
-		}	
-		return res;
+	/**
+	 * Call composeSearch to get SearchRequest object and perform elasticsearch search
+	 * @param queryF
+	 * @param k
+	 * @param field
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("deprecation")
+	private SearchResponse getSearchResponse(String queryF,int k) throws IOException{
+		SearchRequest sr = composeSearch(queryF, k);
+		return client.search(sr);
+	}	
+	
+
+	
+	/**
+	 * Initialize SearchRequest and set query and k
+	 * @param query
+	 * @param k
+	 * @param field
+	 * @return
+	 */
+	private SearchRequest composeSearch(String query, int k) {
+		SearchRequest searchRequest = null;
+		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, Fields.CLASS_NAME,Fields.FLICKR_TAGS);
+		SearchSourceBuilder sb = new SearchSourceBuilder();
+		sb.query(qb);
+		sb.size(k);
+		searchRequest = new SearchRequest(Parameters.INDEX_NAME);
+		searchRequest.types("doc");
+		searchRequest.source(sb);
+	    return searchRequest;
 	}
 	
 	/**
@@ -176,7 +229,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @param field
 	 * @return
 	 */
-	private SearchRequest composeSearch(String query, int k, String field) {
+	private SearchRequest composeSearch(String query, int k,String field) {
 		SearchRequest searchRequest = null;
 		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, field);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
@@ -186,7 +239,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		searchRequest.types("doc");
 		searchRequest.source(sb);
 	    return searchRequest;
-	}
+	}	
 	
 	/**
 	 * For each result evaluate the distance with the query, call  setDist to set the distance, then sort the results

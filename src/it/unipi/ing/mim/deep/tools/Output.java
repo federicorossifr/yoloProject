@@ -23,7 +23,7 @@ public class Output {
 					html += "</tr>\n";
 				html += "<tr>\n";
 			}
-			html += "<td><img align='center' border='0' height='160' title='" + ids.get(i).getId() + ", dist: "
+			html += "<td>" + ids.get(i).getBoundingBoxIndex() +"<img align='center' border='0' height='160' title='" + ids.get(i).getId() + ", dist: "
 			        + ids.get(i).getDist() + "' src='" + baseURI + ids.get(i).getId() + "'></td>\n";
 		}
 		if (ids.size() != 0)
