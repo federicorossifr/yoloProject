@@ -11,6 +11,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
@@ -101,7 +103,7 @@ public class YoloGUI extends Application {
 	
 	@Override
 	public void start(Stage stage) {
-	
+		StatusLogger.getLogger().setLevel(Level.OFF);			
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
