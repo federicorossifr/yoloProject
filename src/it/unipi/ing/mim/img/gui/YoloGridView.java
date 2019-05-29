@@ -3,10 +3,14 @@ package it.unipi.ing.mim.img.gui;
 import java.util.List;
 
 import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class YoloGridView extends ScrollPane{
 	
@@ -44,6 +48,14 @@ public class YoloGridView extends ScrollPane{
 			setPadding(new Insets(10,10,10,10));
 		}
 		
+		public void displayImage(Image i) {
+			Stage s = new Stage();
+			ImageView tmp = new ImageView();
+			tmp.setImage(i);
+			s.setTitle("Image");
+			s.setScene(new Scene(new Group(tmp),i.getWidth(),i.getHeight()));
+			s.show();
+		}
 		
 		public void clearView() {
 			getChildren().clear();
@@ -56,6 +68,11 @@ public class YoloGridView extends ScrollPane{
 			int colCnt = 0, rowCnt = 0;
 			 for (int i=0; i<items.size(); i++) {
 			    	ImageView imgIn = new ImageView(items.get(i));
+			    	imgIn.setOnMouseClicked(ev -> {
+			    		ImageView imm = (ImageView) ev.getTarget();
+			    		Image imgg = imm.getImage();
+			    		displayImage(imgg);
+			    	});
 			    	imgIn.setFitHeight(imageSize);
 			    	imgIn.setFitWidth(imageSize);
 			    	imgIn.setPreserveRatio(true);
