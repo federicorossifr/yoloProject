@@ -109,7 +109,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	     boolean retVal = false;
 	     if (v instanceof ImgDescriptor){
 	    	 ImgDescriptor ptr = (ImgDescriptor) v;
-	         retVal = ptr.id == this.id;
+	         retVal = ptr.id.equals(this.id);
 	     }
 	     return retVal;
 	 }
