@@ -1,9 +1,10 @@
 package it.unipi.ing.mim.deep;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 
-public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
+public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , Comparator<ImgDescriptor>{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -112,5 +113,10 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	     }
 	     return retVal;
 	 }
+
+	@Override
+	public int compare(ImgDescriptor o1, ImgDescriptor o2) {
+		return Double.valueOf(o2.dist).compareTo(o1.dist);
+	}
 
 }
