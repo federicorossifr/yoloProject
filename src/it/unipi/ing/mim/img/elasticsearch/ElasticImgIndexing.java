@@ -108,11 +108,11 @@ public class ElasticImgIndexing implements AutoCloseable {
 
 		// Index
 		if(bb_index == -1) {
-			jMap.put(Fields.BOUNDING_BOX, "");
+			jMap.put(Fields.BOUNDING_BOX, "-1");
 			jMap.put(Fields.CLASS_NAME, "");
 		}
 		else {
-			jMap.put(Fields.BOUNDING_BOX, detImg.serializeBoundingBoxes().get(bb_index));
+			jMap.put(Fields.BOUNDING_BOX, bb_index+"");
 			jMap.put(Fields.CLASS_NAME,detImg.getClassByIndex(bb_index));
 		}
 
