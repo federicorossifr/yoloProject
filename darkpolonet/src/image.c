@@ -245,6 +245,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
     printf("Opening file: %s",outPath);
     FILE* fp = fopen(outPath,"w");
     if(!fp) printf("Null\n");
+    float probability = 0.0f;
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
@@ -253,6 +254,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                 if (class < 0) {
                     strcat(labelstr, names[j]);
                     class = j;
+                    probability = dets[i].prob[j];
                 } else {
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
@@ -295,8 +297,8 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
             // HERE WE HAVE THE BBOX
-            printf("%s,%d,%d,%d,%d\n",labelstr,left,right,top,bot);
-            fprintf(fp,"%s;%d,%d,%d,%d\n",labelstr,left,right,top,bot);
+            printf("%s,%f,%d,%d,%d,%d\n",labelstr,probability,left,right,top,bot);
+            fprintf(fp,"%s;%f,%d,%d,%d,%d\n",labelstr,probability,left,right,top,bot);
             //MY JOB IS DONE HERE, I can go
             //
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
