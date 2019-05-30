@@ -22,6 +22,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
+import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
@@ -50,7 +51,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("dog",400);
+			List<ImgDescriptor> res = imgSearch.searchByClass("dog",400);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -189,22 +190,25 @@ public class ElasticImgSearching implements AutoCloseable {
      * @param tags
      * @return
      */
-	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) {
+	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) throws IOException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		for(int i = 0; i < hits.length; ++i) {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
 			ImgDescriptor im = imgDescMap.get(id+bbox_index);
-			im.setDist(hits[i].getScore());
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
 				im_app.setDist(im.getDist());
 				if(!res.contains(im_app))
 					res.add(im_app);
 			}
-			else
+			else {
+				DetailedImage di = new DetailedImage(id);
+				im.setDist(di.getScoreByIndex(Integer.parseInt(bbox_index)));
 				res.add(im);
+			}
+				
 		}	
 		return res;
 	}
