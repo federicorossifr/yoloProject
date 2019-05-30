@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("csassar",5);
+			List<ImgDescriptor> res = imgSearch.searchByClass("cat",10);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -76,6 +76,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		}
 	}
 	
+	
 	public void close() throws IOException {
 		client.close();
 	}
@@ -99,6 +100,39 @@ public class ElasticImgSearching implements AutoCloseable {
 		k = k>res.size()?res.size():k;
 		return res.subList(0, k);
 	}
+	/**
+	 * Search only by human tag
+	 * @param queryF
+	 * @param k
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public List<ImgDescriptor> searchByTag(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
+		SearchResponse searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
+		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
+		resTag = reorder(queryF,resTag);
+		k = k>resTag.size()?resTag.size():k;
+		return resTag.subList(0, k);
+	}
+	/**
+	 * Search only by bounding box class 
+	 * @param queryF
+	 * @param k
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public List<ImgDescriptor> searchByClass(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
+		SearchResponse searchResponse = getSearchResponse(queryF, k, Fields.CLASS_NAME);
+		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
+		resClass = reorder(queryF,resClass);
+		k = k>resClass.size()?resClass.size():k;
+		return resClass.subList(0, k);
+	}
+	
 	
 	/**
 	 * Image search by class name and afterwards by tag, matches by tag are not added if already present
@@ -165,6 +199,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			im.setDist(hits[i].getScore());
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
+				im_app.setDist(im.getDist());
 				res.add(im_app);
 			}
 			else

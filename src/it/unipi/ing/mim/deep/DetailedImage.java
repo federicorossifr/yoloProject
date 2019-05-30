@@ -42,6 +42,7 @@ public class DetailedImage {
 	 */
 	public DetailedImage(File imageFile,File yoloMetaData) throws IOException {
 		imageID = imageFile.getName();
+		System.out.println("file name " +imageID);
 		FileReader metaReader = new FileReader(yoloMetaData);
 		BufferedReader metaBuferedReader = new BufferedReader(metaReader);
 		String metaLine = "";
@@ -52,6 +53,8 @@ public class DetailedImage {
 			if(splittedYoloData.length < 2) break;
 			//Otherwise last element is a list of int coordinates for bounding boxes
 			String[] coords = splittedYoloData[splittedYoloData.length-1].split(",");
+			double score  = Double.parseDouble(coords[0]);
+			coords = Arrays.copyOfRange(coords,1,coords.length);
 			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();			
 			//From first element to the n-1 element there are class-names, for the bounding box.
 			classNames.add(splittedYoloData[0]);
