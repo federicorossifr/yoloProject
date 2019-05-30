@@ -1,2 +1,0 @@
-person;269,397,321,490
-maroc,morocco,fès,fez,فاس,darbatha

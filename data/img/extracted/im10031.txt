@@ -1,1 +1,0 @@
-belgium,brussels,night,nightshot,illumination,geo:lat=50855864,geo:lon=4358976,geotagged

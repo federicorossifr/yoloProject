@@ -1,2 +1,0 @@
-person;72,86,390,409
-paris,antenna,roof,man,chimney

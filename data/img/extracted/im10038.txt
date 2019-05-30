@@ -1,3 +1,0 @@
-person;62,143,138,298
-person;83,123,164,270
-surf,tabla,surfero,surfista,ola,playa

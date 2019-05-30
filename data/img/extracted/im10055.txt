@@ -1,3 +1,0 @@
-person;440,470,209,299
-person;418,484,190,325
-calle,interrail,berlín,alemania,germany,deutschland,fuente,alexanderplatz,escena,panasonic,dmcfz8,urbana,cutout,desaturadoselectivo,lumix,berlin,i500,interestingness218,hireen
