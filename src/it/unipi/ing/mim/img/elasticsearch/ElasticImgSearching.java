@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByClass("cat",10);
+			List<ImgDescriptor> res = imgSearch.search("dog",400);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -200,7 +200,8 @@ public class ElasticImgSearching implements AutoCloseable {
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
 				im_app.setDist(im.getDist());
-				res.add(im_app);
+				if(!res.contains(im_app))
+					res.add(im_app);
 			}
 			else
 				res.add(im);
