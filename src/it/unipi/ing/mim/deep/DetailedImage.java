@@ -26,6 +26,7 @@ public class DetailedImage {
 	private ArrayList<int[]> boundingBoxes = new ArrayList<>();
 	private String[] humanTags;
 	private Mat content;
+	private ArrayList<Double>  scores=new ArrayList<>();
 
 	/*
 
@@ -59,6 +60,7 @@ public class DetailedImage {
 			//From first element to the n-1 element there are class-names, for the bounding box.
 			classNames.add(splittedYoloData[0]);
 			boundingBoxes.add(intCoords);
+			scores.add(score);
 			//Second element is a list of int-coordinates
 
 		}
@@ -164,7 +166,9 @@ public class DetailedImage {
 	public int[] getBoundingBoxByIndex(int i) {
 		return boundingBoxes.get(i);
 	}
-	
+	public Double getScoreByIndex(int i) {
+		return scores.get(i);
+	}
 	/**
 	 * Serialize tags into a single string to be fed into indexer
 	 * @return joint string of all human tags
