@@ -14,8 +14,8 @@ import java.io.StringWriter;
 import java.util.List;
 
 public class Runner {
-	public static final String HTTP_BASE_URI = "localhost:9000/img/mirflickr/";
-	
+	public static final String HTTP_BASE_URI = "http://localhost:9001/mirflickr/";
+
 	private static ElasticImgSearching imgSearch;
 	static {
 		try {
@@ -27,19 +27,46 @@ public class Runner {
 
     public static void main(String[] args) throws IOException {
         Mappings mappings = new Mappings();
-        mappings.addMap("GET", "/search", new AbstractResponse() {
+	mappings.addMap("GET", "/search_byimg", new AbstractResponse() {
             @Override
             public Response getResponse(Request req) {
             	String htmlres = "";
 
             	try {
+            		String filename = req.getAttribute("file");
+            		if(filename.equals("null"))
+            			throw new Exception("file field required");
+
         			//Image Query File
-        			File imgQuery = new File(Parameters.SRC_FOLDER, "im10001.jpg");
+        			File imgQuery = new File(Parameters.SRC_FOLDER, filename);
 
         			DNNExtractor extractor = new DNNExtractor();
         			float[] imgFeatures = extractor.extract(imgQuery, Parameters.DEEP_LAYER);
         			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
-        			List<ImgDescriptor> res = imgSearch.search("car",5);
+        			List<ImgDescriptor> res = imgSearch.search(query,20);
+
+        			htmlres = Output.generateHTML(res, HTTP_BASE_URI);
+            	} catch(Exception e) {
+            		StringWriter errors = new StringWriter();
+            		e.printStackTrace(new PrintWriter(errors));
+            		htmlres = "Exception: " + errors.toString();
+            	}
+
+                return new Response(htmlres);
+            }
+        });
+
+        mappings.addMap("GET", "/search_bytext", new AbstractResponse() {
+            @Override
+            public Response getResponse(Request req) {
+            	String htmlres = "";
+
+            	try {
+            		String querytext = req.getAttribute("text");
+            		if(querytext.equals("null"))
+            			throw new Exception("text field required");
+
+        			List<ImgDescriptor> res = imgSearch.search(querytext,20);
 
         			htmlres = Output.generateHTML(res, HTTP_BASE_URI);
             	} catch(Exception e) {
@@ -54,7 +81,7 @@ public class Runner {
 
         HttpServer server;
         while(true) {
-            server = new HttpServer(8888, mappings);
+            server = new HttpServer(9000, mappings);
             Request req = server.accept();
             server.sendResponse(req);
             server.shut();

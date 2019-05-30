@@ -146,4 +146,10 @@
             <jvmarg value="-Xmx2G"/>
         </java>
     </target>
+    <target name="HTTPServer">
+        <java classname="it.unipi.ing.mim.http.Runner" failonerror="true" fork="yes">
+            <classpath refid="YOLO.classpath"/>
+            <jvmarg value="-Xmx2G"/>
+        </java>
+    </target>
 </project>
