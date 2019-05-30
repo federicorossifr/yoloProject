@@ -51,7 +51,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByTag("dog",100);
+			List<ImgDescriptor> res = imgSearch.search("dog",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -92,11 +92,8 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	public List<ImgDescriptor> search(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
-		SearchResponse searchResponse = getSearchResponse(queryF, k,Fields.CLASS_NAME);
-		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
-		//perform search by tags and add them if they are not already present with bbox
-		searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
-		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
+		List<ImgDescriptor> resClass =  searchByClass(queryF, k);
+		List<ImgDescriptor> resTag =  searchByTag(queryF, k);
 		List<ImgDescriptor> res = reorder(queryF,joinImgDescriptors(resTag, resClass));
 		k = k>res.size()?res.size():k;
 		return res.subList(0, k);
@@ -208,12 +205,9 @@ public class ElasticImgSearching implements AutoCloseable {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
 			ImgDescriptor im = imgDescMap.get(id+bbox_index);
-			System.out.println("new setted dist: "+im.getDist());
-
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
 				im_app.setDist(hits[i].getScore());
-				System.out.println("new setted dist: "+im_app.getDist());
 				if(!res.contains(im_app))
 					res.add(im_app);
 			}
