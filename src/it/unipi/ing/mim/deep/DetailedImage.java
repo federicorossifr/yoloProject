@@ -54,7 +54,7 @@ public class DetailedImage {
 			//Otherwise last element is a list of int coordinates for bounding boxes
 			String[] coords = splittedYoloData[splittedYoloData.length-1].split(",");
 			double score  = Double.parseDouble(coords[0]);
-			coords = Arrays.copyOfRange(coords,1,coords.length-1);
+			coords = Arrays.copyOfRange(coords,1,coords.length);
 			int[] intCoords = Arrays.stream(coords).mapToInt(Integer::parseInt).toArray();			
 			//From first element to the n-1 element there are class-names, for the bounding box.
 			classNames.add(splittedYoloData[0]);
