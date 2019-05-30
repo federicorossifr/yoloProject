@@ -1,2 +1,0 @@
-cell phone;273,465,51,331
-amazon,kindle,ebook,ereader,digital

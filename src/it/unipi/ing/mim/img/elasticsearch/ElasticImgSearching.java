@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("car",5);
+			List<ImgDescriptor> res = imgSearch.search("csassar",5);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -95,7 +95,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		//perform search by tags and add them if they are not already present with bbox
 		searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
 		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
-		return reorder(queryF,joinImgDescriptors(resTag, resClass)).subList(0, k);
+		List<ImgDescriptor> res = reorder(queryF,joinImgDescriptors(resTag, resClass));
+		k = k>res.size()?res.size():k;
+		return res.subList(0, k);
 	}
 	
 	/**
@@ -128,7 +130,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		SearchResponse searchResponse = getSearchResponse(f2t, k,Fields.BOUNDING_BOX_FEAT);
-		return reorder(queryF,performSearch(searchResponse,false)).subList(0, k);
+		List<ImgDescriptor> res = reorder(queryF,performSearch(searchResponse,false));
+		k = k>res.size()?res.size():k;
+		return res.subList(0, k);
 	}
 	
 	/**

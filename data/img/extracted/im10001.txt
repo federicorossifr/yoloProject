@@ -1,2 +1,0 @@
-car;315,459,147,298
-torino,turin,500,fiat,cinquecento,mirafiori,pista,curva,rosso,red,car,auto,500x500

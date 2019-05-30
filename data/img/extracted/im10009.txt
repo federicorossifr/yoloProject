@@ -1,2 +1,0 @@
-person;301,442,57,282
-lastfm:event=292183,music,concert,tegansara,112407,tegan,sara,highres,fullsize,lisnerauditorium,lisner,auditorium,saraquin,quin,teganandsara,teganquin,dc,washingtondc,washington

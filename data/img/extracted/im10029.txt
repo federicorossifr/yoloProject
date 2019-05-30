@@ -1,3 +1,0 @@
-cup;261,293,245,269
-person;53,251,66,256
-babyshower,amymuller,alexandra,alexandramuller

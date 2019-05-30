@@ -1,2 +1,0 @@
-person;1,125,0,484
-doris,drta,jesus,dal

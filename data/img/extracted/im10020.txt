@@ -1,2 +1,0 @@
-person;128,236,173,487
-lubitel2,lubitel,lubitelll,雙眼相機,120film

@@ -1,3 +1,0 @@
-person;147,282,220,496
-person;216,304,141,348
-rosario,santafe,argentina

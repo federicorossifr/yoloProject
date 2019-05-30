@@ -1,1 +1,0 @@
-leol30,gauge,dial,squaredcircle,sqrandom,scoutleol30
