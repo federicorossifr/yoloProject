@@ -261,21 +261,21 @@ public class YoloGUI extends Application {
 				
 				if(!topK.getText().equals("")) {
 					
-					int k = Integer.parseInt(topK.getText());
-					if( k > 0)
+					int k = it.unipi.ing.mim.deep.Parameters.K;
+					
+					try {
+						
+						k = Integer.parseInt(topK.getText());
+						if(k<=0)
+							k = it.unipi.ing.mim.deep.Parameters.K;
+						
+					}catch(NumberFormatException e) {
+						k = it.unipi.ing.mim.deep.Parameters.K;
+					}finally {
+						
+						topK.setText(String.valueOf(k));
 						searched = tagSearch(humanTags.getText(), k);
-					else {
-						
-						topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
-						searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
-						
 					}
-					
-				}else{
-					
-					topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
-					searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
-					
 				}
 					
 				
@@ -283,18 +283,21 @@ public class YoloGUI extends Application {
 				
 				if(!topK.getText().equals("")) {
 					
-					int k = Integer.parseInt(topK.getText());
-					if(k>0)
+					int k = it.unipi.ing.mim.deep.Parameters.K;
+					
+					try {
+						
+						k = Integer.parseInt(topK.getText());
+						if(k<=0)
+							k = it.unipi.ing.mim.deep.Parameters.K;
+						
+					}catch(NumberFormatException e) {
+						k = it.unipi.ing.mim.deep.Parameters.K;
+					}finally {
+						
+						topK.setText(String.valueOf(k));
 						searched = imageSearch(openedImage, k);
-					else {
-						topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
-						searched = imageSearch(openedImage, it.unipi.ing.mim.deep.Parameters.K);
 					}
-					
-				}else{
-					
-					topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
-					searched = tagSearch(humanTags.getText(), it.unipi.ing.mim.deep.Parameters.K);
 					
 				}
 			}
