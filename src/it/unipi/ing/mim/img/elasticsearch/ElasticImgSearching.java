@@ -50,7 +50,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("cat",10);
+			List<ImgDescriptor> res = imgSearch.searchByTag("cat",10);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -126,8 +126,8 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	public List<ImgDescriptor> searchByClass(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
-		SearchResponse searchResponse = getSearchResponse(queryF, k, Fields.FLICKR_TAGS);
-		List<ImgDescriptor> resClass =  performSearch(searchResponse,true);
+		SearchResponse searchResponse = getSearchResponse(queryF, k, Fields.CLASS_NAME);
+		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
 		resClass = reorder(queryF,resClass);
 		k = k>resClass.size()?resClass.size():k;
 		return resClass.subList(0, k);
@@ -249,9 +249,6 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	public List<ImgDescriptor> reorder(String queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
-		for(ImgDescriptor r:res) 
-			if(r.getId().equals("im1638.jpg"))
-				System.out.println("MATCHED "+r.getDist());
 		Collections.sort(res,Collections.reverseOrder());
 		return res;
 	}
