@@ -51,7 +51,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByClass("dog",400);
+			List<ImgDescriptor> res = imgSearch.searchByTag("dog",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -115,7 +115,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		List<ImgDescriptor> resTag =  performSearch(searchResponse,true);
 		resTag = reorder(queryF,resTag);
 		k = k>resTag.size()?resTag.size():k;
-		return resTag.subList(0, k);
+		return normalizeMax(resTag.subList(0, k));	
 	}
 	/**
 	 * Search only by bounding box class 
@@ -126,6 +126,17 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
+	private List<ImgDescriptor> normalizeMax(List<ImgDescriptor> sorted){
+		Double max = sorted.get(0).getDist();
+		if(max==0.0)
+			return sorted;
+		System.out.println("max :"+max);
+		for (ImgDescriptor im: sorted) {
+			System.out.println("new distance: "+ im.getDist()/max+" old dist: "+im.getDist());
+			im.setDist(im.getDist()/max);
+		}
+		return sorted;
+	}
 	public List<ImgDescriptor> searchByClass(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
 		SearchResponse searchResponse = getSearchResponse(queryF, k, Fields.CLASS_NAME);
 		List<ImgDescriptor> resClass =  performSearch(searchResponse,false);
@@ -197,9 +208,12 @@ public class ElasticImgSearching implements AutoCloseable {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
 			ImgDescriptor im = imgDescMap.get(id+bbox_index);
+			System.out.println("new setted dist: "+im.getDist());
+
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
-				im_app.setDist(im.getDist());
+				im_app.setDist(hits[i].getScore());
+				System.out.println("new setted dist: "+im_app.getDist());
 				if(!res.contains(im_app))
 					res.add(im_app);
 			}
@@ -208,7 +222,6 @@ public class ElasticImgSearching implements AutoCloseable {
 				im.setDist(di.getScoreByIndex(Integer.parseInt(bbox_index)));
 				res.add(im);
 			}
-				
 		}	
 		return res;
 	}
