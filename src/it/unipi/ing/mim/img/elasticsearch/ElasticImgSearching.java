@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.http.HttpHost;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.spatial.bbox.BBoxSimilarityValueSource;
+import org.apache.lucene.spatial.bbox.BBoxStrategy;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
@@ -213,7 +215,9 @@ public class ElasticImgSearching implements AutoCloseable {
 			}
 			else {
 				DetailedImage di = new DetailedImage(id);
-				im.setDist(di.getScoreByIndex(Integer.parseInt(bbox_index)));
+				//first case is for search by example, second by class
+				Double dist = Integer.parseInt(bbox_index)==-1?hits[i].getScore():di.getScoreByIndex(Integer.parseInt(bbox_index));
+				im.setDist(dist);
 				res.add(im);
 			}
 		}	
