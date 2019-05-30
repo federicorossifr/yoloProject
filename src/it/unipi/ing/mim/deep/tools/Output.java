@@ -11,8 +11,8 @@ import java.util.List;
 public class Output {
 
 	public static final int COLUMNS = 5;
-
-	public static void toHTML(List<ImgDescriptor> ids, String baseURI, File outputFile) {
+	
+	public static String generateHTML(List<ImgDescriptor> ids, String baseURI) {
 		String html = "<html>\n<body>\n<table align='center'>\n";
 
 		for (int i = 0; i < ids.size(); i++) {
@@ -30,6 +30,12 @@ public class Output {
 			html += "</tr>\n";
 
 		html += "</table>\n</body>\n</html>";
+		
+		return html;
+	}
+
+	public static void toHTML(List<ImgDescriptor> ids, String baseURI, File outputFile) {
+		String html = generateHTML(ids, baseURI);
 		
 		try {
 	        string2File(html, outputFile);
