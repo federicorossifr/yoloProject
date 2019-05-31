@@ -161,7 +161,7 @@ public class ElasticImgSearching implements AutoCloseable {
 				for(int i = 0; i < classNames.size();++i) {
 					if(queryMap.contains(classNames.get(i))) {
 						ImgDescriptor imgDesc = new ImgDescriptor(null,imageId,i);
-						imgDesc.setDist(h.getScore());
+						imgDesc.setDist(h.getScore()*di.getScoreByIndex(i));
 						res.add(imgDesc);
 					}
 				}
