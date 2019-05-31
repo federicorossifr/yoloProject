@@ -1,6 +1,7 @@
 package it.unipi.ing.mim.deep;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 
 
@@ -102,7 +103,12 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	}
 	
 	public String toString() {
+		return  toString(id,Integer.toString(boundingBoxIndex));
+	}
+	
+	public static String toString(String id,String boundingBoxIndex) {
 		return  DetailedImage.getFileNameWithoutExtension(id) + "-" + boundingBoxIndex;
+		
 	}
     @Override
 	public boolean equals(Object v) {
@@ -113,7 +119,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	     }
 	     return retVal;
 	 }
-
+   
 	@Override
 	public int compare(ImgDescriptor o1, ImgDescriptor o2) {
 		return Double.valueOf(o2.dist).compareTo(o1.dist);

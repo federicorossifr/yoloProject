@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -26,6 +28,7 @@ public class DetailedImage {
 	private ArrayList<int[]> boundingBoxes = new ArrayList<>();
 	private String[] humanTags;
 	private Mat content;
+	private ArrayList<Double>  scores=new ArrayList<>();
 
 	/*
 
@@ -42,7 +45,6 @@ public class DetailedImage {
 	 */
 	public DetailedImage(File imageFile,File yoloMetaData) throws IOException {
 		imageID = imageFile.getName();
-		System.out.println("file name " +imageID);
 		FileReader metaReader = new FileReader(yoloMetaData);
 		BufferedReader metaBuferedReader = new BufferedReader(metaReader);
 		String metaLine = "";
@@ -59,6 +61,7 @@ public class DetailedImage {
 			//From first element to the n-1 element there are class-names, for the bounding box.
 			classNames.add(splittedYoloData[0]);
 			boundingBoxes.add(intCoords);
+			scores.add(score);
 			//Second element is a list of int-coordinates
 
 		}
@@ -157,6 +160,10 @@ public class DetailedImage {
 		return humanTags;
 	}
 	
+	public ArrayList<String> getClassNames() {
+		return classNames;
+	}
+	
 	public String getClassByIndex(int i) {
 		return classNames.get(i);
 	}
@@ -164,7 +171,9 @@ public class DetailedImage {
 	public int[] getBoundingBoxByIndex(int i) {
 		return boundingBoxes.get(i);
 	}
-	
+	public Double getScoreByIndex(int i) {
+		return scores.get(i);
+	}
 	/**
 	 * Serialize tags into a single string to be fed into indexer
 	 * @return joint string of all human tags
@@ -211,6 +220,19 @@ public class DetailedImage {
 	
 	public static String getFileNameWithoutExtension(String fileStr) {
 		return fileStr.substring(0, fileStr.length()-4);
+	}
+	
+	public String serializeDistinctClasses() {
+		Set<String> distinctClasses = new HashSet<>();
+		String result = "";
+		for(String c:classNames)
+			if(distinctClasses.add(c))
+				result+=c+" ";
+		return result.trim();
+	}
+
+	public String serializeClasses() {
+		return String.join(" ", classNames);
 	}
 		
 }

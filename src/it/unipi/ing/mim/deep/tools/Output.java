@@ -14,7 +14,7 @@ public class Output {
 
 	public static String generateHTML(List<ImgDescriptor> ids, String baseURI) {
 		String html = "<html>\n<body>\n<table align='center'>\n";
-
+		if(ids == null) return;
 		for (int i = 0; i < ids.size(); i++) {
 			System.out.println(i + " - " + (float) ids.get(i).getDist() + "\t" + ids.get(i).getId() );
 
