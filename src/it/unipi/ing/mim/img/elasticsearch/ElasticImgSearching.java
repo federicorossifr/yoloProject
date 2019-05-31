@@ -21,8 +21,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
@@ -201,7 +199,6 @@ public class ElasticImgSearching implements AutoCloseable {
 	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) throws IOException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
-		System.out.println("hits size "+hits.length);
 		for(int i = 0; i < hits.length; ++i) {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
