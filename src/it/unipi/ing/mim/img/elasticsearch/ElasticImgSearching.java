@@ -23,6 +23,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -57,7 +58,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByClass("dog person",100);
+			List<ImgDescriptor> res = imgSearch.searchByClass("dog AND person",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -256,7 +257,8 @@ public class ElasticImgSearching implements AutoCloseable {
 	 */
 	private SearchRequest composeSearch(String query, int k, String field,String indexName) {
 		SearchRequest searchRequest = null;
-		QueryBuilder qb = QueryBuilders.multiMatchQuery(query, field);
+		//QueryBuilder qb = QueryBuilders.multiMatchQuery(query, field);
+		QueryBuilder qb = QueryBuilders.queryStringQuery(query).defaultField(field);
 		SearchSourceBuilder sb = new SearchSourceBuilder();
 		sb.query(qb);
 		sb.size(k);

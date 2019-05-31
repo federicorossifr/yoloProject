@@ -227,6 +227,7 @@ public class DetailedImage {
 		Set<String> distinctClasses = new HashSet<>();
 		for(String c:classNames)
 			distinctClasses.add(c);
+		
 		return String.join(" ", distinctClasses.toArray(String[]::new));
 	}
 
