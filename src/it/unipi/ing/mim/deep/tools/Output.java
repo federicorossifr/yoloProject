@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Output {
 
-	public static final int COLUMNS = 5;
+	public static final int COLUMNS = 3;
 
 	public static String generateHTML(List<ImgDescriptor> ids, String baseURI) {
 		String html = "<html>\n<body>\n<table align='center'>\n";

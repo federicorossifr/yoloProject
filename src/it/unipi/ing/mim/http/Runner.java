@@ -43,7 +43,7 @@ public class Runner {
         			DNNExtractor extractor = new DNNExtractor();
         			float[] imgFeatures = extractor.extract(imgQuery, Parameters.DEEP_LAYER);
         			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
-        			List<ImgDescriptor> res = imgSearch.search(query,20);
+        			List<ImgDescriptor> res = imgSearch.search(query,100);
 
         			htmlres = Output.generateHTML(res, HTTP_BASE_URI);
             	} catch(Exception e) {
@@ -66,7 +66,7 @@ public class Runner {
             		if(querytext.equals("null"))
             			throw new Exception("text field required");
 
-        			List<ImgDescriptor> res = imgSearch.search(querytext,20);
+        			List<ImgDescriptor> res = imgSearch.search(querytext,100);
 
         			htmlres = Output.generateHTML(res, HTTP_BASE_URI);
             	} catch(Exception e) {
@@ -78,6 +78,54 @@ public class Runner {
                 return new Response(htmlres);
             }
         });
+
+        mappings.addMap("GET", "/search_bytag", new AbstractResponse() {
+            @Override
+            public Response getResponse(Request req) {
+                String htmlres = "";
+
+                try {
+                        String querytext = req.getAttribute("text");
+                        if(querytext.equals("null"))
+                                throw new Exception("text field required");
+
+                                List<ImgDescriptor> res = imgSearch.searchByTag(querytext,100);
+
+                                htmlres = Output.generateHTML(res, HTTP_BASE_URI);
+                } catch(Exception e) {
+                        StringWriter errors = new StringWriter();
+                        e.printStackTrace(new PrintWriter(errors));
+                        htmlres = "Exception: " + errors.toString();
+                }
+
+                return new Response(htmlres);
+            }
+        });
+
+        mappings.addMap("GET", "/search_byclass", new AbstractResponse() {
+            @Override
+            public Response getResponse(Request req) {
+                String htmlres = "";
+
+                try {
+                        String querytext = req.getAttribute("text");
+                        if(querytext.equals("null"))
+                                throw new Exception("text field required");
+
+                                List<ImgDescriptor> res = imgSearch.searchByClass(querytext,100);
+
+                                htmlres = Output.generateHTML(res, HTTP_BASE_URI);
+                } catch(Exception e) {
+                        StringWriter errors = new StringWriter();
+                        e.printStackTrace(new PrintWriter(errors));
+                        htmlres = "Exception: " + errors.toString();
+                }
+
+                return new Response(htmlres);
+            }
+        });
+
+
 
         HttpServer server;
         while(true) {
