@@ -1,15 +1,26 @@
 package it.unipi.ing.mim.img.gui;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import it.unipi.ing.mim.deep.DetailedImage;
+import it.unipi.ing.mim.deep.ImageUtils;
+import it.unipi.ing.mim.deep.ImgDescriptor;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class YoloGridView extends ScrollPane{
@@ -31,7 +42,7 @@ public class YoloGridView extends ScrollPane{
 		gallery.clearView();
 	}
 	
-	public void refreshItems(List<Image> items) {
+	public void refreshItems(List<ImgDescriptor> items) throws IOException {
 		gallery.refreshItems(items);
 	}
 	
@@ -48,12 +59,24 @@ public class YoloGridView extends ScrollPane{
 			setPadding(new Insets(10,10,10,10));
 		}
 		
-		public void displayImage(Image i) {
+		public void displayImageDetails(String id, Image imTemp) throws IOException {
 			Stage s = new Stage();
 			ImageView tmp = new ImageView();
-			tmp.setImage(i);
+			tmp.setImage(imTemp);
+			DetailedImage di = new DetailedImage(id);
+			Label lab = new Label();
+			String details = new String("");
+			for(int j = 0; j<di.getBoundingBoxes().size(); ++j)
+				details += "CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
+			lab.setText(details);
 			s.setTitle("Image");
-			s.setScene(new Scene(new Group(tmp),i.getWidth(),i.getHeight()));
+			ScrollPane sp = new ScrollPane(lab);
+			sp.setPrefHeight(100);
+			Label det = new Label("DETAILS");
+			det.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+			VBox vb = new VBox(20,tmp, det,sp);
+			vb.setAlignment(Pos.CENTER);
+			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+177));
 			s.show();
 		}
 		
@@ -61,17 +84,23 @@ public class YoloGridView extends ScrollPane{
 			getChildren().clear();
 		}
 		
-		public void refreshItems(List<Image> items){
+		public void refreshItems(List<ImgDescriptor> items) throws IOException{
 			
 			clearView();
 			
 			int colCnt = 0, rowCnt = 0;
 			 for (int i=0; i<items.size(); i++) {
-			    	ImageView imgIn = new ImageView(items.get(i));
+			    	ImageView imgIn = new ImageView(ImageUtils.getDrawable(items.get(i)));
+			    	imgIn.setId(items.get(i).getId());
 			    	imgIn.setOnMouseClicked(ev -> {
 			    		ImageView imm = (ImageView) ev.getTarget();
 			    		Image imgg = imm.getImage();
-			    		displayImage(imgg);
+			    		try {
+							displayImageDetails(imm.getId(), imgg);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 			    	});
 			    	imgIn.setFitHeight(imageSize);
 			    	imgIn.setFitWidth(imageSize);
