@@ -26,7 +26,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.sun.javafx.iio.common.ImageDescriptor;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
 import it.unipi.ing.mim.deep.DetailedImage;
