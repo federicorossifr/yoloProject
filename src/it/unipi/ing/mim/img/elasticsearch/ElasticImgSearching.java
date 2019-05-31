@@ -130,15 +130,25 @@ public class ElasticImgSearching implements AutoCloseable {
 		return normalizeMax(resClass.subList(0, k));
 	}	 
 	
+	/**
+	 * Method to perform a textual search (either on YOLO_TAGS or FLICKR_TAGS)
+	 * 
+	 * @param searchResponse
+	 * @param mode
+	 * @param query
+	 * @return
+	 * @throws IOException
+	 */
 	private List<ImgDescriptor> performTextualSearch(SearchResponse searchResponse, TAGS_SEARCH_MODE mode,String query) throws IOException {
+		//Build an index for the query terms to be used later
 		Set<String> queryMap = new HashSet<>();
 		for(String s: query.split(" ")) 
 			queryMap.add(s);
 		
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
+		
 		for(SearchHit h:hits) {
-			System.out.println("dccc");
 			Map<String,Object> hitContent = h.getSourceAsMap();
 			String imageId = (String)hitContent.get(Fields.IMG_ID);
 			if(mode == TAGS_SEARCH_MODE.FLICKR) {
