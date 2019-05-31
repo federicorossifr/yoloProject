@@ -119,19 +119,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> , 
 	     }
 	     return retVal;
 	 }
-    public String serializeFeatures() {
-    	ArrayList<String> rawFeatures = new ArrayList<String>();
-		for(float f:getFeatures()) 
-			rawFeatures.add(Float.toString(f));
-		return String.join(",",rawFeatures.toArray(String[]::new));
-    }
-    
-    public void deserializeFeatures(String features) {
-    	String[] rawFeatures = features.split(",");
-    	normalizedVector = new float[rawFeatures.length];
-    	for(int i = 0; i < rawFeatures.length; ++i)
-    		normalizedVector[i] = Float.parseFloat(rawFeatures[i]);
-    }
+   
 	@Override
 	public int compare(ImgDescriptor o1, ImgDescriptor o2) {
 		return Double.valueOf(o2.dist).compareTo(o1.dist);

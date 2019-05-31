@@ -224,10 +224,11 @@ public class DetailedImage {
 	
 	public String serializeDistinctClasses() {
 		Set<String> distinctClasses = new HashSet<>();
+		String result = "";
 		for(String c:classNames)
-			distinctClasses.add(c);
-		
-		return String.join(" ", distinctClasses.toArray(String[]::new));
+			if(distinctClasses.add(c))
+				result+=c+" ";
+		return result.trim();
 	}
 
 	public String serializeClasses() {
