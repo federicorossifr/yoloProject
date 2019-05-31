@@ -203,12 +203,16 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
-		for (ImgDescriptor im: resTag) 
-			if(!resClass.contains(im))
+		HashSet<String> resClassSet = new HashSet<String>();
+		for (ImgDescriptor im: resClass)
+			resClassSet.add(im.toString());
+
+		for (ImgDescriptor im: resTag)
+			if(!resClassSet.contains(im))
 				resClass.add(im);
 		return resClass;
 	}
-	
+
 	/**
 	 * Image search by example
 	 * @param queryF
