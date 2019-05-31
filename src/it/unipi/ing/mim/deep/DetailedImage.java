@@ -45,7 +45,6 @@ public class DetailedImage {
 	 */
 	public DetailedImage(File imageFile,File yoloMetaData) throws IOException {
 		imageID = imageFile.getName();
-		System.out.println("file name " +imageID);
 		FileReader metaReader = new FileReader(yoloMetaData);
 		BufferedReader metaBuferedReader = new BufferedReader(metaReader);
 		String metaLine = "";

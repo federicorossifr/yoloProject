@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
@@ -94,7 +95,8 @@ public class ElasticImgIndexing implements AutoCloseable {
 	public void index() throws IOException {
 		//LOOP
 			//index all dataset features into Elasticsearch
-		int i = 0;
+		int i = 1;
+		BulkRequest bulkRequest = new BulkRequest();
 		for(ImgDescriptor imgDesc: imgDescDataset) {
 			System.out.println("Indexing " + i);
 			
@@ -103,12 +105,21 @@ public class ElasticImgIndexing implements AutoCloseable {
 					new File(Parameters.META_SRC_FOLDER.getPath() + "/" + DetailedImage.getFileNameWithoutExtension(imgFile) + ".txt"));
 			
 			if(!present.contains(imgDesc.getId())) {
-				client.index(composeTagRequest(imgDesc,dimg), RequestOptions.DEFAULT);
+				//client.index(composeTagRequest(imgDesc,dimg), RequestOptions.DEFAULT);
+				bulkRequest.add(composeTagRequest(imgDesc,dimg));
 				present.add(imgDesc.getId());
 			}
-			client.index(composeFeatureRequest(imgDesc,dimg), RequestOptions.DEFAULT);
+			//client.index(composeFeatureRequest(imgDesc,dimg), RequestOptions.DEFAULT);
+			bulkRequest.add(composeFeatureRequest(imgDesc,dimg));
+			if(i%Parameters.BULK_CHUNK == 0) {
+				System.out.println("Bulking: "+Parameters.BULK_CHUNK);
+				client.bulk(bulkRequest, RequestOptions.DEFAULT);
+				bulkRequest = new BulkRequest();
+			}
 			i++;
 		}
+		if(i%Parameters.BULK_CHUNK != 0)
+			client.bulk(bulkRequest, RequestOptions.DEFAULT);
 	}
 	private IndexRequest composeTagRequest(ImgDescriptor imgDesc,DetailedImage detImg) {
 		IndexRequest request = new IndexRequest(Parameters.TAGS_INDEX_NAME, "doc");

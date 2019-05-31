@@ -50,4 +50,5 @@ public class Parameters {
 	//BBOX parameters
 	public static final int NO_BOUNDING_BOX = -1;
 
+	public static final int BULK_CHUNK = 8192;
 }
