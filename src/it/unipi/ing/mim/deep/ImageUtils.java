@@ -35,10 +35,11 @@ public class ImageUtils {
 		if(bboxIdx >= 0) {
 			int[] bboxCoords = di.getBoundingBoxByIndex(bboxIdx);
 			Rect roi = getRectFromCorners(bboxCoords);
-			rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
+			//rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
+			imageContent = new Mat(imageContent,roi);
 		} 
-		/*imshow("rect",imageContent);
-		waitKey();*/
+		imshow("rect",imageContent);
+		waitKey();
 		return matToImage(imageContent);
 	}
 	

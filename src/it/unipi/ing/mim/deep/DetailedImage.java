@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -159,6 +161,10 @@ public class DetailedImage {
 		return humanTags;
 	}
 	
+	public ArrayList<String> getClassNames() {
+		return classNames;
+	}
+	
 	public String getClassByIndex(int i) {
 		return classNames.get(i);
 	}
@@ -215,6 +221,17 @@ public class DetailedImage {
 	
 	public static String getFileNameWithoutExtension(String fileStr) {
 		return fileStr.substring(0, fileStr.length()-4);
+	}
+	
+	public String serializeDistinctClasses() {
+		Set<String> distinctClasses = new HashSet<>();
+		for(String c:classNames)
+			distinctClasses.add(c);
+		return String.join(" ", distinctClasses.toArray(String[]::new));
+	}
+
+	public String serializeClasses() {
+		return String.join(" ", classNames);
 	}
 		
 }
