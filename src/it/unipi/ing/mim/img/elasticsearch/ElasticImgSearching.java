@@ -181,7 +181,9 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> normalizeMax(List<ImgDescriptor> sorted){
-		if(sorted.size() <= 0) return null;
+		if(sorted.size() <= 0)
+			return sorted;
+
 		Double max = sorted.get(0).getDist();
 		if(max==0.0)
 			return sorted;
