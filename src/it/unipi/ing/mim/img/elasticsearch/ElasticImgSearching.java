@@ -21,6 +21,8 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
@@ -53,7 +55,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.search("dog",100);
+			List<ImgDescriptor> res = imgSearch.searchByTag("dog",50);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -129,11 +131,8 @@ public class ElasticImgSearching implements AutoCloseable {
 		Double max = sorted.get(0).getDist();
 		if(max==0.0)
 			return sorted;
-		System.out.println("max :"+max);
-		for (ImgDescriptor im: sorted) {
-			System.out.println("new distance: "+ im.getDist()/max+" old dist: "+im.getDist());
+		for (ImgDescriptor im: sorted)
 			im.setDist(im.getDist()/max);
-		}
 		return sorted;
 	}
 	public List<ImgDescriptor> searchByClass(String queryF,int k) throws ParseException, IOException, ClassNotFoundException{
@@ -155,10 +154,9 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
-		for (ImgDescriptor im: resTag) {
+		for (ImgDescriptor im: resTag) 
 			if(!resClass.contains(im))
 				resClass.add(im);
-		}
 		return resClass;
 	}
 	
@@ -203,6 +201,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	private List<ImgDescriptor> performSearch(SearchResponse searchResponse, boolean tags) throws IOException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
+		System.out.println("hits size "+hits.length);
 		for(int i = 0; i < hits.length; ++i) {
 			String id = (String)hits[i].getSourceAsMap().get(Fields.IMG_ID);
 			String bbox_index = (String)hits[i].getSourceAsMap().get(Fields.BOUNDING_BOX);
@@ -210,7 +209,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			if(tags) {
 				ImgDescriptor im_app = new ImgDescriptor(im.getFeatures(),id, Parameters.NO_BOUNDING_BOX);
 				im_app.setDist(hits[i].getScore());
-				if(!res.contains(im_app))
+				if(!res.contains(im_app)) 
 					res.add(im_app);
 			}
 			else {
@@ -220,7 +219,7 @@ public class ElasticImgSearching implements AutoCloseable {
 				im.setDist(dist);
 				res.add(im);
 			}
-		}	
+		}
 		return res;
 	}
 	
