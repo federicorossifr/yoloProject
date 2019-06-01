@@ -15,10 +15,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -63,6 +65,8 @@ public class YoloGridView extends ScrollPane{
 			Stage s = new Stage();
 			ImageView tmp = new ImageView();
 			tmp.setImage(imTemp);
+			tmp.setClip(null);
+			tmp.setEffect(new DropShadow(20,Color.BLACK));
 			DetailedImage di = new DetailedImage(id);
 			Label lab = new Label();
 			String details = new String("");
@@ -106,6 +110,16 @@ public class YoloGridView extends ScrollPane{
 			    	imgIn.setFitHeight(imageSize);
 			    	imgIn.setFitWidth(imageSize);
 			    	imgIn.setPreserveRatio(true);
+			    	imgIn.setClip(null);
+			    	imgIn.setEffect(new DropShadow(20, Color.BLACK));
+			    	imgIn.setOnMouseMoved(ev ->{
+			    		ImageView onIm = (ImageView)ev.getTarget();
+			    		onIm.setEffect(new DropShadow(40, Color.BLACK));
+			    		});
+			    	imgIn.setOnMouseExited(ev ->{
+			    		ImageView onIm = (ImageView)ev.getTarget();
+			    		onIm.setEffect(new DropShadow(20, Color.BLACK));
+			    		});
 			        add(imgIn, colCnt, rowCnt);
 			        colCnt++;
 			        if (colCnt>numCols) {

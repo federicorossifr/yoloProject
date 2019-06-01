@@ -37,6 +37,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -157,6 +158,8 @@ public class YoloGUI extends Application {
 		VBox inputBox = new VBox(20,checkboxBox,hboxTag, topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
+		img.setClip(null);
+		img.setEffect(new DropShadow(20, Color.BLACK));
 		Text inftx = new Text("Click Here to Load an Image");
 	    StackPane pane = new StackPane(img, inftx);
 	    pane.setAlignment(Pos.CENTER);
