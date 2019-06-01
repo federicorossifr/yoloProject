@@ -3,6 +3,7 @@ package it.unipi.ing.mim.img.gui;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import it.unipi.ing.mim.deep.ImageUtils;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -29,10 +31,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -59,7 +64,7 @@ public class YoloGUI extends Application {
 	private Button startSearch = new Button("Start Search");
 	private YoloGridView imageResults = new YoloGridView();
 	private ImageView loading = new ImageView();
-	
+	private RadioButton tagR, classR, bothR;
 	private String loadingPath = "data/img/gui/loading.gif";
 	
 	private float[] imgFeatures;
@@ -106,6 +111,7 @@ public class YoloGUI extends Application {
 		StatusLogger.getLogger().setLevel(Level.OFF);			
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
+		fileChooser.setInitialDirectory(new File("data/img/mirflickr"));
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
 		
 		ImageView yoloIcon = new ImageView(new Image(new File("data/img/gui/darknet.png").toURI().toString()));
@@ -124,9 +130,11 @@ public class YoloGUI extends Application {
 		
 		topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
 		
-		Label tagLabel = new Label("Human Tag:");
+		Label tagLabel = new Label("Tag:");
 		Label topKLabel = new Label("Top K-NN: ");
-		HBox hboxTag = new HBox(20,new Label(""),tagLabel, humanTags);
+		HBox foobox = new HBox();
+		foobox.setPrefWidth(27);
+		HBox hboxTag = new HBox(20,new Label(""),tagLabel, foobox, humanTags);
 		HBox topKBox = new HBox(20,new Label(""), topKLabel, topK );
 		
 		loading.setFitHeight(30);
@@ -136,9 +144,22 @@ public class YoloGUI extends Application {
 		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
 		
-		VBox inputBox = new VBox(20,hboxTag, topKBox);
+		Label checkboxL = new Label("Search in: ");
+		tagR = new RadioButton("Tags");
+		classR = new RadioButton("Yolo Classes");
+		bothR = new RadioButton("Both");
+		bothR.setSelected(true);
+		ToggleGroup tg = new ToggleGroup();
+		tagR.setToggleGroup(tg);
+		classR.setToggleGroup(tg);
+		bothR.setToggleGroup(tg);
+		HBox checkboxBox = new HBox(20, new Label(""),checkboxL, tagR, classR, bothR); 
+		
+		VBox inputBox = new VBox(20,checkboxBox,hboxTag, topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
+		img.setClip(null);
+		img.setEffect(new DropShadow(20, Color.BLACK));
 		Text inftx = new Text("Click Here to Load an Image");
 	    StackPane pane = new StackPane(img, inftx);
 	    pane.setAlignment(Pos.CENTER);
@@ -146,7 +167,7 @@ public class YoloGUI extends Application {
 		VBox imageBox = new VBox(pane);
 		imageBox.setAlignment(Pos.CENTER);
 
-	    
+		
 		HBox topPane = new HBox(150, inputBox, new VBox(160,new VBox(),searchBox), imageBox);
 		VBox allPane = new VBox(20, topTitle,topPane, imageResults);
 		
@@ -174,6 +195,11 @@ public class YoloGUI extends Application {
 			e.printStackTrace();
 		}
 		
+		humanTags.textProperty().addListener(
+				(ObservableValue<? extends String> observable,String oldValue, String newValue)->{
+	            	if(!newValue.equals(""))
+	            		img.setImage(null);
+	            });
 	    imageBox.setOnMouseClicked( (MouseEvent event) ->{
 	    	
 	    	openedImage = fileChooser.showOpenDialog(stage);
@@ -181,6 +207,8 @@ public class YoloGUI extends Application {
 	
 	        	Image i = new Image(openedImage.toURI().toString());
 	        	img.setImage(i);
+	        	humanTags.setText("");
+	        	startSearch.requestFocus();
 	        	
 	        }else
 	        	img.setImage(null);
@@ -205,7 +233,16 @@ public class YoloGUI extends Application {
 	private List<ImgDescriptor> tagSearch(String tag, int k) {
 		
 		try {
+			
+			if(bothR.isSelected())
 			return eSearch.search(tag, k);
+			else if(tagR.isSelected())
+				return eSearch.searchByTag(tag, k);
+			else if(classR.isSelected())
+				return eSearch.searchByClass(tag, k);
+			else
+				return null;
+			
 		} catch (ClassNotFoundException e) {
 			showException(e);
 			return null;
@@ -227,7 +264,7 @@ public class YoloGUI extends Application {
 		imgFeatures = extractor.extract(image, it.unipi.ing.mim.deep.Parameters.DEEP_LAYER);
 
 		ImgDescriptor imDes = new ImgDescriptor(imgFeatures, openedImage.getName());
-		
+	
 		try {	
 			return eSearch.search(imDes,k);
 			
@@ -255,7 +292,6 @@ public class YoloGUI extends Application {
 		public void run() {
 			
 			List<ImgDescriptor> searched = null;
-			ArrayList<Image> imageTemp = new ArrayList<Image>();
 			
 			if(!humanTags.getText().equals("")) {
 				
@@ -275,6 +311,7 @@ public class YoloGUI extends Application {
 						
 						topK.setText(String.valueOf(k));
 						searched = tagSearch(humanTags.getText(), k);
+						
 					}
 				}
 					
@@ -302,20 +339,21 @@ public class YoloGUI extends Application {
 				}
 			}
 			
-			for(ImgDescriptor i : searched) {
-				try {
-					imageTemp.add(ImageUtils.getDrawable(i));
-				} catch (IOException e) {
-					showException(e);
-				}
+			if(searched != null) {
+				final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
+				
+				Platform.runLater(()->{
+					try {
+						imageResults.refreshItems(imageTemp);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					loading.setImage(null); 
+					startSearch.setDisable(false);
+				});
 			}
 			
-			Platform.runLater(()->{
-				imageResults.refreshItems(imageTemp); 
-				loading.setImage(null); 
-				startSearch.setDisable(false);
-			});
-		
 		}
 
 	}
