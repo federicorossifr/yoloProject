@@ -336,26 +336,21 @@ public class YoloGUI extends Application {
 				}
 			}
 			
-			/*for(ImgDescriptor i : searched) {
-				try {
-					imageTemp.add(ImageUtils.getDrawable(i));
-				} catch (IOException e) {
-					showException(e);
-				}
-			}*/
-			final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
+			if(searched != null) {
+				final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
+				
+				Platform.runLater(()->{
+					try {
+						imageResults.refreshItems(imageTemp);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					loading.setImage(null); 
+					startSearch.setDisable(false);
+				});
+			}
 			
-			Platform.runLater(()->{
-				try {
-					imageResults.refreshItems(imageTemp);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-				loading.setImage(null); 
-				startSearch.setDisable(false);
-			});
-		
 		}
 
 	}

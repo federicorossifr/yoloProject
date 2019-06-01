@@ -77,6 +77,7 @@ public class YoloGridView extends ScrollPane{
 			VBox vb = new VBox(20,tmp, det,sp);
 			vb.setAlignment(Pos.CENTER);
 			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+177));
+			s.setTitle(id);
 			s.show();
 		}
 		
