@@ -1,19 +1,25 @@
 package it.unipi.ing.mim.deep;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.rectangle;
+import static org.bytedeco.opencv.global.opencv_imgproc.putText;
+import static org.bytedeco.opencv.global.opencv_imgproc.CV_FILLED;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bytedeco.javacpp.indexer.ByteRawIndexer;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.Scalar;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import javafx.embed.swing.SwingFXUtils;
@@ -36,10 +42,33 @@ public class ImageUtils {
 			int[] bboxCoords = di.getBoundingBoxByIndex(bboxIdx);
 			Rect roi = getRectFromCorners(bboxCoords);
 			rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
+			//putText(imageContent,di.getClassByIndex(bboxIdx),new Point(bboxCoords[0]-3,bboxCoords[2]-3),1,1.0f,new Scalar(255.0,255.0,255.0,1));				
 		} 
-		/*imshow("rect",imageContent);
-		waitKey();*/
+
 		return matToImage(imageContent);
+	}
+	
+	public static Image getDrawable(List<ImgDescriptor> li) throws IOException {
+		Mat imageContent = null;
+		for(ImgDescriptor i:li) {
+			DetailedImage di = new DetailedImage(i.getId());
+			if(imageContent == null)
+				imageContent = di.getContent();
+			int bboxIdx = i.getBoundingBoxIndex();
+			if(bboxIdx >= 0) {
+				int[] bboxCoords = di.getBoundingBoxByIndex(bboxIdx);
+				Rect roi = getRectFromCorners(bboxCoords);
+				rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),2,3,0);
+
+				Rect bg = new Rect(new Point(bboxCoords[0],bboxCoords[2]-10),new Point(bboxCoords[0]+roi.width()+1,bboxCoords[2]));
+				rectangle(imageContent,bg,new Scalar(0.0,0.0,255.0,1),CV_FILLED,0,0);
+				putText(imageContent,di.getClassByIndex(bboxIdx),new Point(bboxCoords[0]-3,bboxCoords[2]-3),1,1.0f,new Scalar(255.0,255.0,255.0,1));				
+			} 
+
+		}
+		imshow(".",imageContent);
+		waitKey();
+		return matToImage(imageContent);		
 	}
 	
 	/**
@@ -74,6 +103,13 @@ public class ImageUtils {
 	
 
 	public static void main(String[] args) throws IOException {
-			Image m = getDrawable(new ImgDescriptor(null,"im10001.jpg",0));
+		ArrayList<ImgDescriptor> test = new ArrayList<ImgDescriptor>();
+		test.add(new ImgDescriptor(null,"im9715.jpg",0));
+		test.add(new ImgDescriptor(null,"im9715.jpg",1));
+		test.add(new ImgDescriptor(null,"im9715.jpg",3));
+		test.add(new ImgDescriptor(null,"im9715.jpg",4));
+		test.add(new ImgDescriptor(null,"im9715.jpg",5));
+		
+		Image m = getDrawable(test);
 	}
 }

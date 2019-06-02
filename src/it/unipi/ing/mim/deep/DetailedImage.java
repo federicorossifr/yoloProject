@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -43,7 +45,6 @@ public class DetailedImage {
 	 */
 	public DetailedImage(File imageFile,File yoloMetaData) throws IOException {
 		imageID = imageFile.getName();
-		System.out.println("file name " +imageID);
 		FileReader metaReader = new FileReader(yoloMetaData);
 		BufferedReader metaBuferedReader = new BufferedReader(metaReader);
 		String metaLine = "";
@@ -159,6 +160,10 @@ public class DetailedImage {
 		return humanTags;
 	}
 	
+	public ArrayList<String> getClassNames() {
+		return classNames;
+	}
+	
 	public String getClassByIndex(int i) {
 		return classNames.get(i);
 	}
@@ -215,6 +220,19 @@ public class DetailedImage {
 	
 	public static String getFileNameWithoutExtension(String fileStr) {
 		return fileStr.substring(0, fileStr.length()-4);
+	}
+	
+	public String serializeDistinctClasses() {
+		Set<String> distinctClasses = new HashSet<>();
+		String result = "";
+		for(String c:classNames)
+			if(distinctClasses.add(c))
+				result+=c+" ";
+		return result.trim();
+	}
+
+	public String serializeClasses() {
+		return String.join(" ", classNames);
 	}
 		
 }
