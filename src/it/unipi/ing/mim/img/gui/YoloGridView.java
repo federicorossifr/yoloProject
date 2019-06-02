@@ -1,8 +1,14 @@
 package it.unipi.ing.mim.img.gui;
 
+import static org.bytedeco.opencv.global.opencv_imgproc.rectangle;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.Rect;
+import org.bytedeco.opencv.opencv_core.Scalar;
 
 import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImageUtils;
@@ -23,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class YoloGridView extends ScrollPane{
@@ -68,19 +75,44 @@ public class YoloGridView extends ScrollPane{
 			tmp.setClip(null);
 			tmp.setEffect(new DropShadow(20,Color.BLACK));
 			DetailedImage di = new DetailedImage(id);
-			Label lab = new Label();
-			String details = new String("");
-			for(int j = 0; j<di.getBoundingBoxes().size(); ++j)
-				details += "CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
-			lab.setText(details);
+			VBox bboxDetails = new VBox(5);
+			Label bboxTags = new Label("YOLO BOUNDING BOXES:");
+			bboxTags.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			bboxDetails.getChildren().add(bboxTags);
+			
+			for(int j = 0; j<di.getBoundingBoxes().size(); ++j) {
+				
+				String details = String.valueOf(j+1) + ") CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
+				Text lab = new Text(details);
+				lab.setId(String.valueOf(j));
+				lab.setOnMouseMoved(ev->{
+					Text l = (Text) ev.getTarget(); 
+					Mat imageContent =   org.bytedeco.opencv.global.opencv_imgcodecs.imread("data/img/mirflickr/"+id);
+					int[] bboxCoords = di.getBoundingBoxByIndex(Integer.parseInt(l.getId()));
+					Rect roi = ImageUtils.getRectFromCorners(bboxCoords);
+					rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
+					tmp.setImage(ImageUtils.matToImage(imageContent));
+				});
+				bboxDetails.getChildren().add(lab);
+				
+			}
+			
+			Label tagsL = new Label("FLICKR TAGS:");
+			tagsL.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			Label t = new Label(di.serializeHumanTags());
+			t.setMaxWidth(imTemp.getWidth()-20);
+			t.setWrapText(true);
+			bboxDetails.getChildren().add(tagsL);
+			bboxDetails.getChildren().add(t);
+
 			s.setTitle("Image");
-			ScrollPane sp = new ScrollPane(lab);
-			sp.setPrefHeight(100);
+			ScrollPane sp = new ScrollPane(bboxDetails);
+			sp.setPrefHeight(153);
 			Label det = new Label("DETAILS");
 			det.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 			VBox vb = new VBox(20,tmp, det,sp);
 			vb.setAlignment(Pos.CENTER);
-			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+177));
+			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+230));
 			s.setTitle(id);
 			s.show();
 		}

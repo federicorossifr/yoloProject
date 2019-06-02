@@ -76,7 +76,7 @@ public class ImageUtils {
 	 * @param m
 	 * @return
 	 */
-	private static Image matToImage(Mat m) {
+	public static Image matToImage(Mat m) {
 		int width = m.cols();
 		int height = m.rows();
 		int depth = m.channels();
@@ -92,7 +92,7 @@ public class ImageUtils {
 	 * @param bbox
 	 * @return
 	 */
-	private static Rect getRectFromCorners(int[] bbox) {
+	public static Rect getRectFromCorners(int[] bbox) {
 		int left=bbox[0],right=bbox[1],top=bbox[2],bottom=bbox[3];
 		// OpenCv ROIs want top-left corner and width,height of the rectangle
 		int width = Math.abs(right-left);
