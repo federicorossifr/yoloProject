@@ -87,12 +87,14 @@ public class YoloGridView extends ScrollPane{
 				lab.setId(String.valueOf(j));
 				lab.setOnMouseMoved(ev->{
 					Text l = (Text) ev.getTarget(); 
-					Mat imageContent =   org.bytedeco.opencv.global.opencv_imgcodecs.imread("data/img/mirflickr/"+id);
-					int[] bboxCoords = di.getBoundingBoxByIndex(Integer.parseInt(l.getId()));
-					Rect roi = ImageUtils.getRectFromCorners(bboxCoords);
-					rectangle(imageContent, roi, new Scalar(0.0,0.0,255.0,1),5,8,0);
-					tmp.setImage(ImageUtils.matToImage(imageContent));
-				});
+					int idT = Integer.parseInt(l.getId());
+					try {
+						tmp.setImage(ImageUtils.getDrawable(new ImgDescriptor(null,id,idT)));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}); 
 				bboxDetails.getChildren().add(lab);
 				
 			}
