@@ -161,7 +161,12 @@ public class ElasticImgSearching implements AutoCloseable {
 				for(int i = 0; i < classNames.size();++i) {
 					if(queryMap.contains(classNames.get(i))) {
 						ImgDescriptor imgDesc = new ImgDescriptor(null,imageId,i);
-						imgDesc.setDist(h.getScore());
+						
+						float score = h.getScore();
+						if(Parameters.USE_ACCURACY_FOR_CLASS_SCORE)
+							score *= di.getScoreByIndex(i);
+						imgDesc.setDist(score);
+
 						res.add(imgDesc);
 					}
 				}
@@ -181,7 +186,9 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> normalizeMax(List<ImgDescriptor> sorted){
-		if(sorted.size() <= 0) return null;
+		if(sorted.size() <= 0)
+			return sorted;
+
 		Double max = sorted.get(0).getDist();
 		if(max==0.0)
 			return sorted;
@@ -203,12 +210,16 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
-		for (ImgDescriptor im: resTag) 
-			if(!resClass.contains(im))
+		HashSet<String> resClassSet = new HashSet<String>();
+		for (ImgDescriptor im: resClass)
+			resClassSet.add(im.getId());
+
+		for (ImgDescriptor im: resTag)
+			if(!resClassSet.contains(im.getId()))
 				resClass.add(im);
 		return resClass;
 	}
-	
+
 	/**
 	 * Image search by example
 	 * @param queryF

@@ -51,4 +51,6 @@ public class Parameters {
 	public static final int NO_BOUNDING_BOX = -1;
 
 	public static final int BULK_CHUNK = 8192;
+	
+	public static final Boolean USE_ACCURACY_FOR_CLASS_SCORE = false;
 }
