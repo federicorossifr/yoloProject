@@ -76,11 +76,13 @@ public class YoloGridView extends ScrollPane{
 			tmp.setEffect(new DropShadow(20,Color.BLACK));
 			DetailedImage di = new DetailedImage(id);
 			VBox bboxDetails = new VBox(5);
-			String details = new String("");
+			Label bboxTags = new Label("YOLO BOUNDING BOXES:");
+			bboxTags.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			bboxDetails.getChildren().add(bboxTags);
 			
 			for(int j = 0; j<di.getBoundingBoxes().size(); ++j) {
 				
-				details = String.valueOf(j+1) + ") CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
+				String details = String.valueOf(j+1) + ") CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
 				Text lab = new Text(details);
 				lab.setId(String.valueOf(j));
 				lab.setOnMouseMoved(ev->{
@@ -94,14 +96,23 @@ public class YoloGridView extends ScrollPane{
 				bboxDetails.getChildren().add(lab);
 				
 			}
+			
+			Label tagsL = new Label("FLICKR TAGS:");
+			tagsL.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			Label t = new Label(di.serializeHumanTags());
+			t.setMaxWidth(imTemp.getWidth()-20);
+			t.setWrapText(true);
+			bboxDetails.getChildren().add(tagsL);
+			bboxDetails.getChildren().add(t);
+
 			s.setTitle("Image");
 			ScrollPane sp = new ScrollPane(bboxDetails);
-			sp.setPrefHeight(100);
+			sp.setPrefHeight(153);
 			Label det = new Label("DETAILS");
 			det.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 			VBox vb = new VBox(20,tmp, det,sp);
 			vb.setAlignment(Pos.CENTER);
-			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+177));
+			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+230));
 			s.setTitle(id);
 			s.show();
 		}
