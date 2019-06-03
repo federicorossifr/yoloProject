@@ -1,0 +1,23 @@
+>> mean2(r)
+
+ans =
+
+  single
+
+  104.0065
+
+>> mean2(g)
+
+ans =
+
+  single
+
+  116.6692
+
+>> mean2(b)
+
+ans =
+
+  single
+
+  122.6793
