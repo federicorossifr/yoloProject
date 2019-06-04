@@ -44,6 +44,9 @@ public class YoloGUI extends Application {
 	
 	private final int wImgPreview = 200;
 	private final int hImgPreview = 200;
+	private final int space = 20;
+	private final int wLoading = 30;
+	private final int hLoading = 30;
 	
 	private float[] imgFeatures;
 	private File openedImage;
@@ -95,7 +98,7 @@ public class YoloGUI extends Application {
 		initializeIcon(yoloIcon);
 		initializeLogo(yoloText);
 		
-		HBox fooTitle = new HBox(20,yoloIcon, yoloText);
+		HBox fooTitle = new HBox(space,yoloIcon, yoloText);
 		HBox topTitle = new HBox(1, new HBox(),fooTitle);
 		topTitle.setStyle("-fx-background-color: #283747;");
 		fooTitle.setAlignment(Pos.CENTER);
@@ -107,16 +110,12 @@ public class YoloGUI extends Application {
 		Label topKLabel = new Label("Top K-NN: ");
 		HBox foobox = new HBox();
 		foobox.setPrefWidth(27);
-		HBox hboxTag = new HBox(20,new Label(""),tagLabel,foobox, humanTags);
-		HBox topKBox = new HBox(20,new Label(""),topKLabel,topK );
+		HBox hboxTag = new HBox(space,new Label(""),tagLabel,foobox, humanTags);
+		HBox topKBox = new HBox(space,new Label(""),topKLabel,topK );
+		initializeLoading();
 		
-		loading.setFitHeight(30);
-		loading.setFitWidth(30);
-		loading.setPreserveRatio(true);
-		loading.setImage(null);
 		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
-		
 		Label RadioL = new Label("Search in: ");
 		tagR = new RadioButton("Tags");
 		classR = new RadioButton("Yolo Classes");
@@ -126,12 +125,11 @@ public class YoloGUI extends Application {
 		tagR.setToggleGroup(tg);
 		classR.setToggleGroup(tg);
 		bothR.setToggleGroup(tg);
-		HBox radioboxBox = new HBox(20, new Label(""),RadioL, tagR, classR, bothR); 
-		
+		HBox radioboxBox = new HBox(space, new Label(""),RadioL, tagR, classR, bothR); 
 		Label checkBoxL = new Label("Use accuracy for class score: ");
-		HBox checkboxBox = new HBox(20, new Label(""),checkBoxL,useAccuracyC); 
+		HBox checkboxBox = new HBox(space, new Label(""),checkBoxL,useAccuracyC); 
 		
-		VBox inputBox = new VBox(20,radioboxBox,checkboxBox,hboxTag,topKBox);
+		VBox inputBox = new VBox(space,radioboxBox,checkboxBox,hboxTag,topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
 		initializeImgPreview(img);
@@ -143,7 +141,7 @@ public class YoloGUI extends Application {
 		imageBox.setAlignment(Pos.CENTER);
 
 		HBox topPane = new HBox(150, inputBox, new VBox(160,new VBox(),searchBox), imageBox);
-		VBox allPane = new VBox(20, topTitle,topPane, imageResults);
+		VBox allPane = new VBox(space, topTitle,topPane, imageResults);
 		
 	
 		imageBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
@@ -206,6 +204,13 @@ public class YoloGUI extends Application {
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.setInitialDirectory(new File("data/img/mirflickr"));
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
+	}
+	
+	private void initializeLoading() {
+		loading.setFitHeight(hLoading);
+		loading.setFitWidth(wLoading);
+		loading.setPreserveRatio(true);
+		loading.setImage(null);
 	}
 	
 	private void initializeIcon(ImageView yoloIcon) {
