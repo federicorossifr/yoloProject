@@ -38,8 +38,9 @@ public class YoloGUI extends Application {
 	private Button startSearch = new Button("Start Search");
 	private YoloGridView imageResults = new YoloGridView();
 	private ImageView loading = new ImageView();
-	private RadioButton tagR, classR, bothR;
+	private RadioButton tagR=null, classR=null, bothR=null;
 	private String loadingPath = "data/img/gui/loading.gif";
+	private CheckBox useAccuracyC = new CheckBox();
 	
 	private final int wImgPreview = 200;
 	private final int hImgPreview = 200;
@@ -116,7 +117,7 @@ public class YoloGUI extends Application {
 		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
 		
-		Label checkboxL = new Label("Search in: ");
+		Label RadioL = new Label("Search in: ");
 		tagR = new RadioButton("Tags");
 		classR = new RadioButton("Yolo Classes");
 		bothR = new RadioButton("Both");
@@ -125,9 +126,12 @@ public class YoloGUI extends Application {
 		tagR.setToggleGroup(tg);
 		classR.setToggleGroup(tg);
 		bothR.setToggleGroup(tg);
-		HBox checkboxBox = new HBox(20, new Label(""),checkboxL, tagR, classR, bothR); 
+		HBox radioboxBox = new HBox(20, new Label(""),RadioL, tagR, classR, bothR); 
 		
-		VBox inputBox = new VBox(20,checkboxBox,hboxTag, topKBox);
+		Label checkBoxL = new Label("Use accuracy for class score: ");
+		HBox checkboxBox = new HBox(20, new Label(""),checkBoxL,useAccuracyC); 
+		
+		VBox inputBox = new VBox(20,radioboxBox,checkboxBox,hboxTag,topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
 		initializeImgPreview(img);
@@ -152,7 +156,7 @@ public class YoloGUI extends Application {
 		
 		
 		try {
-			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY);
+			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY,false);
 		} catch (ClassNotFoundException e) {
 			showException(e);
 			e.printStackTrace();
@@ -184,6 +188,8 @@ public class YoloGUI extends Application {
                 + "-fx-background-insets: 0, 1; -fx-text-fill: white;-fx-font-weigth: bold");
 	   
 		startSearch.setOnAction((ActionEvent ev)-> {
+			eSearch.setAccuracyForClassScore(useAccuracyC.isSelected());
+			
 			
 			loading.setImage(new Image(new File(loadingPath).toURI().toString()));
 			startSearch.setDisable(true);
@@ -308,7 +314,7 @@ public class YoloGUI extends Application {
 				
 				Platform.runLater(()->{
 					try {
-						imageResults.refreshItems(imageTemp);
+						imageResults.refreshItems(imageTemp, useAccuracyC.isSelected());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

@@ -48,8 +48,8 @@ public class YoloGridView extends ScrollPane{
 		gallery.clearView();
 	}
 	
-	public void refreshItems(List<ImgDescriptor> items) throws IOException {
-		if( Parameters.USE_ACCURACY_FOR_CLASS_SCORE == true )
+	public void refreshItems(List<ImgDescriptor> items, Boolean useAccuracy) throws IOException {
+		if( useAccuracy == true )
 			gallery.refreshItems(items);
 		else {
 			HashMap<String, ArrayList<ImgDescriptor>> hmap = new HashMap<>();

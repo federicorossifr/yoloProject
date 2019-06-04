@@ -40,11 +40,12 @@ public class ElasticImgSearching implements AutoCloseable {
 	private RestHighLevelClient client;
 	private Pivots pivots;
 	private int topKSearch;
+	private Boolean useAccuracyClassScore; 
 	private HashMap<String,ImgDescriptor> imageDescriptorMap = new HashMap<String, ImgDescriptor>();
 	private enum TAGS_SEARCH_MODE  {FLICKR,YOLO};
 	public static void main(String[] args) throws Exception {
 		StatusLogger.getLogger().setLevel(Level.OFF);		
-		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
+		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY,false)) {
 			//Image Query File
 			File imgQuery = new File(Parameters.SRC_FOLDER, "im10001.jpg");
 			
@@ -65,13 +66,15 @@ public class ElasticImgSearching implements AutoCloseable {
 	/**
 	 * Constructor for elastic image searching
 	 * @param pivotsFile
+	 * @param useAccuracyForClassScore
 	 * @param topKSearch
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	public ElasticImgSearching(File pivotsFile, int topKSearch) throws ClassNotFoundException, IOException {
+	public ElasticImgSearching(File pivotsFile, int topKSearch, Boolean useAccuracyForClassScore) throws ClassNotFoundException, IOException {
 		pivots = new Pivots(pivotsFile);
 		this.topKSearch = topKSearch;
+		this.useAccuracyClassScore = useAccuracyForClassScore;
 		RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
 		client = new RestHighLevelClient(builder);	
 		List<ImgDescriptor> l = FeaturesStorage.load(Parameters.STORAGE_FILE);		
@@ -86,6 +89,13 @@ public class ElasticImgSearching implements AutoCloseable {
 		client.close();
 	}
 	
+	public void setAccuracyForClassScore(Boolean a) {
+		this.useAccuracyClassScore = a;
+	}
+	
+	public Boolean getAccuracyForClassScore() {
+		return this.useAccuracyClassScore;
+	}
 	/**
 	 * Image search by class name and afterwards by tag
 	 * @param queryF
@@ -160,7 +170,7 @@ public class ElasticImgSearching implements AutoCloseable {
 						ImgDescriptor imgDesc = new ImgDescriptor(null,imageId,i);
 						
 						float score = h.getScore();
-						if(Parameters.USE_ACCURACY_FOR_CLASS_SCORE)
+						if(this.useAccuracyClassScore)
 							score *= di.getScoreByIndex(i);
 						imgDesc.setDist(score);
 
