@@ -1,60 +1,34 @@
 package it.unipi.ing.mim.img.gui;
 
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
+import javafx.scene.*;
+import javafx.scene.layout.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
-import it.unipi.ing.mim.deep.ImageUtils;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-
-import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.img.elasticsearch.ElasticImgSearching;
-import it.unipi.ing.mim.img.elasticsearch.Pivots;
 
 public class YoloGUI extends Application {
 	
@@ -64,11 +38,15 @@ public class YoloGUI extends Application {
 	private Button startSearch = new Button("Start Search");
 	private YoloGridView imageResults = new YoloGridView();
 	private ImageView loading = new ImageView();
-	private RadioButton tagR, classR, bothR;
+	private RadioButton tagR=null, classR=null, bothR=null;
 	private String loadingPath = "data/img/gui/loading.gif";
+	private CheckBox useAccuracyC = new CheckBox();
 	
 	private final int wImgPreview = 200;
 	private final int hImgPreview = 200;
+	private final int space = 20;
+	private final int wLoading = 30;
+	private final int hLoading = 30;
 	
 	private float[] imgFeatures;
 	private File openedImage;
@@ -120,7 +98,7 @@ public class YoloGUI extends Application {
 		initializeIcon(yoloIcon);
 		initializeLogo(yoloText);
 		
-		HBox fooTitle = new HBox(20,yoloIcon, yoloText);
+		HBox fooTitle = new HBox(space,yoloIcon, yoloText);
 		HBox topTitle = new HBox(1, new HBox(),fooTitle);
 		topTitle.setStyle("-fx-background-color: #283747;");
 		fooTitle.setAlignment(Pos.CENTER);
@@ -132,17 +110,13 @@ public class YoloGUI extends Application {
 		Label topKLabel = new Label("Top K-NN: ");
 		HBox foobox = new HBox();
 		foobox.setPrefWidth(27);
-		HBox hboxTag = new HBox(20,new Label(""),tagLabel,foobox, humanTags);
-		HBox topKBox = new HBox(20,new Label(""),topKLabel,topK );
+		HBox hboxTag = new HBox(space,new Label(""),tagLabel,foobox, humanTags);
+		HBox topKBox = new HBox(space,new Label(""),topKLabel,topK );
+		initializeLoading();
 		
-		loading.setFitHeight(30);
-		loading.setFitWidth(30);
-		loading.setPreserveRatio(true);
-		loading.setImage(null);
 		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
-		
-		Label checkboxL = new Label("Search in: ");
+		Label RadioL = new Label("Search in: ");
 		tagR = new RadioButton("Tags");
 		classR = new RadioButton("Yolo Classes");
 		bothR = new RadioButton("Both");
@@ -151,9 +125,11 @@ public class YoloGUI extends Application {
 		tagR.setToggleGroup(tg);
 		classR.setToggleGroup(tg);
 		bothR.setToggleGroup(tg);
-		HBox checkboxBox = new HBox(20, new Label(""),checkboxL, tagR, classR, bothR); 
+		HBox radioboxBox = new HBox(space, new Label(""),RadioL, tagR, classR, bothR); 
+		Label checkBoxL = new Label("Use accuracy for class score: ");
+		HBox checkboxBox = new HBox(space, new Label(""),checkBoxL,useAccuracyC); 
 		
-		VBox inputBox = new VBox(20,checkboxBox,hboxTag, topKBox);
+		VBox inputBox = new VBox(space,radioboxBox,checkboxBox,hboxTag,topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
 		initializeImgPreview(img);
@@ -165,7 +141,7 @@ public class YoloGUI extends Application {
 		imageBox.setAlignment(Pos.CENTER);
 
 		HBox topPane = new HBox(150, inputBox, new VBox(160,new VBox(),searchBox), imageBox);
-		VBox allPane = new VBox(20, topTitle,topPane, imageResults);
+		VBox allPane = new VBox(space, topTitle,topPane, imageResults);
 		
 	
 		imageBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
@@ -178,7 +154,7 @@ public class YoloGUI extends Application {
 		
 		
 		try {
-			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY);
+			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY,false);
 		} catch (ClassNotFoundException e) {
 			showException(e);
 			e.printStackTrace();
@@ -210,6 +186,8 @@ public class YoloGUI extends Application {
                 + "-fx-background-insets: 0, 1; -fx-text-fill: white;-fx-font-weigth: bold");
 	   
 		startSearch.setOnAction((ActionEvent ev)-> {
+			eSearch.setAccuracyForClassScore(useAccuracyC.isSelected());
+			
 			
 			loading.setImage(new Image(new File(loadingPath).toURI().toString()));
 			startSearch.setDisable(true);
@@ -226,6 +204,13 @@ public class YoloGUI extends Application {
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.setInitialDirectory(new File("data/img/mirflickr"));
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
+	}
+	
+	private void initializeLoading() {
+		loading.setFitHeight(hLoading);
+		loading.setFitWidth(wLoading);
+		loading.setPreserveRatio(true);
+		loading.setImage(null);
 	}
 	
 	private void initializeIcon(ImageView yoloIcon) {
@@ -248,7 +233,7 @@ public class YoloGUI extends Application {
 		//i.setPreserveRatio(true);
 	}
 	
-	private List<ImgDescriptor> tagSearch(String tag, int k) {
+	private List<ImgDescriptor> textSearch(String tag, int k) {
 		try {
 			if(bothR.isSelected())
 				return eSearch.search(tag, k);
@@ -313,7 +298,7 @@ public class YoloGUI extends Application {
 					k = it.unipi.ing.mim.deep.Parameters.K;
 				}finally {
 					topK.setText(String.valueOf(k));
-					searched = tagSearch(humanTags.getText(), k);
+					searched = textSearch(humanTags.getText(), k);
 				}	
 			}else if(img.getImage() != null) {
 				int k = it.unipi.ing.mim.deep.Parameters.K;
@@ -329,12 +314,12 @@ public class YoloGUI extends Application {
 				}	
 			}
 			
-			if(searched != null) {
-				final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
+			if(searched != null) {		
+				final ArrayList<ImgDescriptor> imageTemp = new ArrayList<>(searched);
 				
 				Platform.runLater(()->{
 					try {
-						imageResults.refreshItems(imageTemp);
+						imageResults.refreshItems(imageTemp, useAccuracyC.isSelected());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

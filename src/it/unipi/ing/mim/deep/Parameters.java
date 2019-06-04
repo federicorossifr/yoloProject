@@ -52,5 +52,5 @@ public class Parameters {
 
 	public static final int BULK_CHUNK = 8192;
 	
-	public static final Boolean USE_ACCURACY_FOR_CLASS_SCORE = false;
+	//public static final Boolean USE_ACCURACY_FOR_CLASS_SCORE = false;
 }

@@ -234,5 +234,9 @@ public class DetailedImage {
 	public String serializeClasses() {
 		return String.join(" ", classNames);
 	}
+	
+	public String getImageId() {
+		return imageID;
+	}
 		
 }

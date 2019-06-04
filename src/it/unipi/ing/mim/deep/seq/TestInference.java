@@ -2,36 +2,17 @@ package it.unipi.ing.mim.deep.seq;
 
 
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.opencv_core.Scalar;
-import org.bytedeco.opencv.opencv_core.Size;
+import org.bytedeco.opencv.opencv_core.*;
 import org.bytedeco.opencv.opencv_dnn.*;
-import org.bytedeco.opencv.opencv_stitching.DpSeamFinder;
-
 import static org.bytedeco.opencv.global.opencv_dnn.*;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 import static org.bytedeco.opencv.global.opencv_imgproc.resize;
 
 import java.awt.FlowLayout;
 import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -101,6 +82,7 @@ public class TestInference {
 			 parts[1] = parts[1].replace("}", "").trim();
 			 labels.put(Integer.parseInt(parts[0]),parts[1]);
 		 } 
+		 br.close();
 		 return labels;
 	 }
 	  
