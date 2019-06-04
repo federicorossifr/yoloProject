@@ -66,8 +66,8 @@ public class ImageUtils {
 			} 
 
 		}
-		imshow(".",imageContent);
-		waitKey();
+		//imshow(".",imageContent);
+		//waitKey();
 		return matToImage(imageContent);		
 	}
 	

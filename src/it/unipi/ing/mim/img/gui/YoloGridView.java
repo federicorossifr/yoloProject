@@ -32,6 +32,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.HashMap; 
+
 public class YoloGridView extends ScrollPane{
 	
 	private MyGrid gallery;
@@ -52,7 +55,17 @@ public class YoloGridView extends ScrollPane{
 	}
 	
 	public void refreshItems(List<ImgDescriptor> items) throws IOException {
-		gallery.refreshItems(items);
+		HashMap<String, ArrayList<ImgDescriptor>> hmap = new HashMap<>();
+		for(ImgDescriptor d : items) {
+			if( hmap.get(d.getId()) == null ){
+				hmap.put(d.getId(), new ArrayList<ImgDescriptor>());
+			}
+			ArrayList<ImgDescriptor> al = hmap.get(d.getId());
+			al.add(d);
+		}
+		
+		//gallery.refreshItems(items);
+		gallery.refreshItems(hmap);
 	}
 	
 	private class MyGrid extends GridPane{
@@ -123,6 +136,51 @@ public class YoloGridView extends ScrollPane{
 			getChildren().clear();
 		}
 		
+		private void setImgPreview(ImageView imgIn ) {
+			imgIn.setOnMouseClicked(ev -> {
+	    		ImageView imm = (ImageView) ev.getTarget();
+	    		Image imgg = imm.getImage();
+	    		try {
+					displayImageDetails(imm.getId(), imgg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    	});
+			imgIn.setFitHeight(imageSize);
+	    	imgIn.setFitWidth(imageSize);
+	    	imgIn.setPreserveRatio(true);
+	    	imgIn.setClip(null);
+	    	imgIn.setEffect(new DropShadow(20, Color.BLACK));
+	    	imgIn.setOnMouseMoved(ev ->{
+	    		ImageView onIm = (ImageView)ev.getTarget();
+	    		onIm.setEffect(new DropShadow(40, Color.BLACK));
+	    		});
+	    	imgIn.setOnMouseExited(ev ->{
+	    		ImageView onIm = (ImageView)ev.getTarget();
+	    		onIm.setEffect(new DropShadow(20, Color.BLACK));
+	    		});
+		}
+		
+		public void refreshItems(HashMap<String, ArrayList<ImgDescriptor>> hmap)  throws IOException {
+			clearView();
+			int colCnt = 0, rowCnt = 0;
+			
+			for (String key : hmap.keySet()) {
+				ArrayList<ImgDescriptor> a = hmap.get(key);
+				ImageView imgIn = new ImageView(ImageUtils.getDrawable(a));
+				imgIn.setId(key);
+				setImgPreview(imgIn);
+				
+		        add(imgIn, colCnt++, rowCnt);
+		        
+		        if (colCnt>numCols) {
+		            rowCnt++;
+		            colCnt=0;
+		        }
+			}
+		}
+		
 		public void refreshItems(List<ImgDescriptor> items) throws IOException{
 			
 			clearView();
@@ -131,31 +189,10 @@ public class YoloGridView extends ScrollPane{
 			for (int i=0; i<items.size(); i++) {
 		    	ImageView imgIn = new ImageView(ImageUtils.getDrawable(items.get(i)));
 		    	imgIn.setId(items.get(i).getId());
-		    	imgIn.setOnMouseClicked(ev -> {
-		    		ImageView imm = (ImageView) ev.getTarget();
-		    		Image imgg = imm.getImage();
-		    		try {
-						displayImageDetails(imm.getId(), imgg);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-		    	});
-		    	imgIn.setFitHeight(imageSize);
-		    	imgIn.setFitWidth(imageSize);
-		    	imgIn.setPreserveRatio(true);
-		    	imgIn.setClip(null);
-		    	imgIn.setEffect(new DropShadow(20, Color.BLACK));
-		    	imgIn.setOnMouseMoved(ev ->{
-		    		ImageView onIm = (ImageView)ev.getTarget();
-		    		onIm.setEffect(new DropShadow(40, Color.BLACK));
-		    		});
-		    	imgIn.setOnMouseExited(ev ->{
-		    		ImageView onIm = (ImageView)ev.getTarget();
-		    		onIm.setEffect(new DropShadow(20, Color.BLACK));
-		    		});
-		        add(imgIn, colCnt, rowCnt);
-		        colCnt++;
+		    	setImgPreview(imgIn);
+		    	
+		        add(imgIn, colCnt++, rowCnt);
+
 		        if (colCnt>numCols) {
 		            rowCnt++;
 		            colCnt=0;

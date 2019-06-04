@@ -329,7 +329,7 @@ public class YoloGUI extends Application {
 				}	
 			}
 			
-			if(searched != null) {
+			if(searched != null) {		
 				final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
 				
 				Platform.runLater(()->{
