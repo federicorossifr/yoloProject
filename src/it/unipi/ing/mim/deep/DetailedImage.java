@@ -38,8 +38,8 @@ public class DetailedImage {
 	 * Constrcutor for the DetailedImage from an image file and a metatata file
 	 * @param imageFile file representing the image jpg/png
 	 * @param yoloMetaData file containing metadata with following structure
-	 * 		<class-name>;<left,right,top,bottom>
-	 * 		<class-name>;<left,right,top,bottom>
+	 * 		<class-name>;<score,left,right,top,bottom>
+	 * 		<class-name>;<score,left,right,top,bottom>
 	 * 		<tag1>,<tag2>,<tag3> 
 	 * @throws IOException
 	 */

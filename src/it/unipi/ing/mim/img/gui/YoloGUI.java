@@ -67,6 +67,9 @@ public class YoloGUI extends Application {
 	private RadioButton tagR, classR, bothR;
 	private String loadingPath = "data/img/gui/loading.gif";
 	
+	private final int wImgPreview = 200;
+	private final int hImgPreview = 200;
+	
 	private float[] imgFeatures;
 	private File openedImage;
 	
@@ -110,18 +113,13 @@ public class YoloGUI extends Application {
 	public void start(Stage stage) {
 		StatusLogger.getLogger().setLevel(Level.OFF);			
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Resource File");
-		fileChooser.setInitialDirectory(new File("data/img/mirflickr"));
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
+		initializeFileChooser(fileChooser);
 		
 		ImageView yoloIcon = new ImageView(new Image(new File("data/img/gui/darknet.png").toURI().toString()));
 		ImageView yoloText = new ImageView(new Image(new File("data/img/gui/yologo.png").toURI().toString()));
-		yoloIcon.setFitHeight(100);
-		yoloIcon.setFitWidth(100);
-		yoloIcon.setPreserveRatio(true);
-		yoloText.setFitWidth(150);
-		yoloText.setFitHeight(100);
-		yoloText.setPreserveRatio(true);
+		initializeIcon(yoloIcon);
+		initializeLogo(yoloText);
+		
 		HBox fooTitle = new HBox(20,yoloIcon, yoloText);
 		HBox topTitle = new HBox(1, new HBox(),fooTitle);
 		topTitle.setStyle("-fx-background-color: #283747;");
@@ -134,8 +132,8 @@ public class YoloGUI extends Application {
 		Label topKLabel = new Label("Top K-NN: ");
 		HBox foobox = new HBox();
 		foobox.setPrefWidth(27);
-		HBox hboxTag = new HBox(20,new Label(""),tagLabel, foobox, humanTags);
-		HBox topKBox = new HBox(20,new Label(""), topKLabel, topK );
+		HBox hboxTag = new HBox(20,new Label(""),tagLabel,foobox, humanTags);
+		HBox topKBox = new HBox(20,new Label(""),topKLabel,topK );
 		
 		loading.setFitHeight(30);
 		loading.setFitWidth(30);
@@ -158,8 +156,7 @@ public class YoloGUI extends Application {
 		VBox inputBox = new VBox(20,checkboxBox,hboxTag, topKBox);
 		inputBox.setAlignment(Pos.CENTER);
 		
-		img.setClip(null);
-		img.setEffect(new DropShadow(20, Color.BLACK));
+		initializeImgPreview(img);
 		Text inftx = new Text("Click Here to Load an Image");
 	    StackPane pane = new StackPane(img, inftx);
 	    pane.setAlignment(Pos.CENTER);
@@ -167,13 +164,10 @@ public class YoloGUI extends Application {
 		VBox imageBox = new VBox(pane);
 		imageBox.setAlignment(Pos.CENTER);
 
-		
 		HBox topPane = new HBox(150, inputBox, new VBox(160,new VBox(),searchBox), imageBox);
 		VBox allPane = new VBox(20, topTitle,topPane, imageResults);
 		
-		img.setFitWidth(200);
-		img.setFitHeight(200);
-		//img.setPreserveRatio(true);
+	
 		imageBox.setStyle("-fx-border-color: red; -fx-border-width: 1; -fx-border-style: dotted;");
 		Group root = new Group(allPane);
 		Scene scene = new Scene(root, 1100,800);
@@ -184,9 +178,7 @@ public class YoloGUI extends Application {
 		
 		
 		try {
-			
 			eSearch = new ElasticImgSearching(it.unipi.ing.mim.deep.Parameters.PIVOTS_FILE, it.unipi.ing.mim.deep.Parameters.TOP_K_QUERY);
-		
 		} catch (ClassNotFoundException e) {
 			showException(e);
 			e.printStackTrace();
@@ -229,13 +221,39 @@ public class YoloGUI extends Application {
 		});
 
 	}
+
+	private void initializeFileChooser(FileChooser fileChooser) {
+		fileChooser.setTitle("Open Resource File");
+		fileChooser.setInitialDirectory(new File("data/img/mirflickr"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg"));
+	}
+	
+	private void initializeIcon(ImageView yoloIcon) {
+		yoloIcon.setFitHeight(100);
+		yoloIcon.setFitWidth(100);
+		yoloIcon.setPreserveRatio(true);
+	}
+	
+	private void initializeLogo(ImageView logo) {
+		logo.setFitWidth(150);
+		logo.setFitHeight(100);
+		logo.setPreserveRatio(true);
+	}
+	
+	private void initializeImgPreview(ImageView i) {
+		i.setClip(null);
+		i.setEffect(new DropShadow(20, Color.BLACK));
+		i.setFitWidth(wImgPreview);
+		i.setFitHeight(hImgPreview);
+		//i.setPreserveRatio(true);
+	}
 	
 	private List<ImgDescriptor> tagSearch(String tag, int k) {
-		
+	
 		try {
 			
 			if(bothR.isSelected())
-			return eSearch.search(tag, k);
+				return eSearch.search(tag, k);
 			else if(tagR.isSelected())
 				return eSearch.searchByTag(tag, k);
 			else if(classR.isSelected())
@@ -257,10 +275,8 @@ public class YoloGUI extends Application {
 	}
 	
 	private List<ImgDescriptor> imageSearch(File image, int k) {
-		
 		DNNExtractor extractor = new DNNExtractor();
-
-
+		
 		imgFeatures = extractor.extract(image, it.unipi.ing.mim.deep.Parameters.DEEP_LAYER);
 
 		ImgDescriptor imDes = new ImgDescriptor(imgFeatures, openedImage.getName());
@@ -278,9 +294,6 @@ public class YoloGUI extends Application {
 			showException(e);
 			return null;
 		}
-
-
-		
 	}
 	
 	public static void main(String[] args) {

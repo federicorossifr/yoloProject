@@ -128,40 +128,39 @@ public class YoloGridView extends ScrollPane{
 			clearView();
 			
 			int colCnt = 0, rowCnt = 0;
-			 for (int i=0; i<items.size(); i++) {
-			    	ImageView imgIn = new ImageView(ImageUtils.getDrawable(items.get(i)));
-			    	imgIn.setId(items.get(i).getId());
-			    	imgIn.setOnMouseClicked(ev -> {
-			    		ImageView imm = (ImageView) ev.getTarget();
-			    		Image imgg = imm.getImage();
-			    		try {
-							displayImageDetails(imm.getId(), imgg);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-			    	});
-			    	imgIn.setFitHeight(imageSize);
-			    	imgIn.setFitWidth(imageSize);
-			    	imgIn.setPreserveRatio(true);
-			    	imgIn.setClip(null);
-			    	imgIn.setEffect(new DropShadow(20, Color.BLACK));
-			    	imgIn.setOnMouseMoved(ev ->{
-			    		ImageView onIm = (ImageView)ev.getTarget();
-			    		onIm.setEffect(new DropShadow(40, Color.BLACK));
-			    		});
-			    	imgIn.setOnMouseExited(ev ->{
-			    		ImageView onIm = (ImageView)ev.getTarget();
-			    		onIm.setEffect(new DropShadow(20, Color.BLACK));
-			    		});
-			        add(imgIn, colCnt, rowCnt);
-			        colCnt++;
-			        if (colCnt>numCols) {
-			            rowCnt++;
-			            colCnt=0;
-			        }
+			for (int i=0; i<items.size(); i++) {
+		    	ImageView imgIn = new ImageView(ImageUtils.getDrawable(items.get(i)));
+		    	imgIn.setId(items.get(i).getId());
+		    	imgIn.setOnMouseClicked(ev -> {
+		    		ImageView imm = (ImageView) ev.getTarget();
+		    		Image imgg = imm.getImage();
+		    		try {
+						displayImageDetails(imm.getId(), imgg);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		    	});
+		    	imgIn.setFitHeight(imageSize);
+		    	imgIn.setFitWidth(imageSize);
+		    	imgIn.setPreserveRatio(true);
+		    	imgIn.setClip(null);
+		    	imgIn.setEffect(new DropShadow(20, Color.BLACK));
+		    	imgIn.setOnMouseMoved(ev ->{
+		    		ImageView onIm = (ImageView)ev.getTarget();
+		    		onIm.setEffect(new DropShadow(40, Color.BLACK));
+		    		});
+		    	imgIn.setOnMouseExited(ev ->{
+		    		ImageView onIm = (ImageView)ev.getTarget();
+		    		onIm.setEffect(new DropShadow(20, Color.BLACK));
+		    		});
+		        add(imgIn, colCnt, rowCnt);
+		        colCnt++;
+		        if (colCnt>numCols) {
+		            rowCnt++;
+		            colCnt=0;
+		        }
 			}
-
 		}
 	}
 	
