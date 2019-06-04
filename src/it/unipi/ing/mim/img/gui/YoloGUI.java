@@ -233,7 +233,7 @@ public class YoloGUI extends Application {
 		//i.setPreserveRatio(true);
 	}
 	
-	private List<ImgDescriptor> tagSearch(String tag, int k) {
+	private List<ImgDescriptor> textSearch(String tag, int k) {
 		try {
 			if(bothR.isSelected())
 				return eSearch.search(tag, k);
@@ -298,7 +298,7 @@ public class YoloGUI extends Application {
 					k = it.unipi.ing.mim.deep.Parameters.K;
 				}finally {
 					topK.setText(String.valueOf(k));
-					searched = tagSearch(humanTags.getText(), k);
+					searched = textSearch(humanTags.getText(), k);
 				}	
 			}else if(img.getImage() != null) {
 				int k = it.unipi.ing.mim.deep.Parameters.K;
