@@ -56,7 +56,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByClass("dog AND person",100);
+			List<ImgDescriptor> res = imgSearch.searchByClass("(dog AND NOT person) OR (dog AND NOT person)",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -137,6 +137,31 @@ public class ElasticImgSearching implements AutoCloseable {
 		return normalizeMax(resClass.subList(0, k));
 	}	 
 	
+	private ArrayList<String> getQueryTerms(String query) {
+		// Replace parentheses and boolean operators with one space 
+		String queryTerms = query.replace("(", " ").replace(")", " ")
+				.replace(" AND NOT ", " ")
+				.replace(" OR NOT ", " ")
+				.replace(" AND ", " ")
+				.replace(" OR ", " ");
+				
+		
+		// Replace multiple spaces with one space
+		queryTerms = queryTerms.replaceAll(" +", " ").trim();
+
+		System.out.println("Query: " + query);
+		System.out.println("Polished query: " + queryTerms);
+		
+		// Split string by space to find query terms
+		ArrayList<String> result = new ArrayList<String>(); 
+		for(String s: queryTerms.split(" "))
+		{
+			System.out.println(s);
+			result.add(s);
+		}
+		return result;
+	}
+	
 	/**
 	 * Method to perform a textual search (either on YOLO_TAGS or FLICKR_TAGS)
 	 * 
@@ -149,8 +174,8 @@ public class ElasticImgSearching implements AutoCloseable {
 	private List<ImgDescriptor> performTextualSearch(SearchResponse searchResponse, TAGS_SEARCH_MODE mode,String query) throws IOException {
 		//Build an index for the query terms to be used later
 		Set<String> queryMap = new HashSet<>();
-		for(String s: query.split(" ")) 
-			queryMap.add(s);
+		
+		for(String s: getQueryTerms(query)) queryMap.add(s);
 		
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
