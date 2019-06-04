@@ -8,6 +8,7 @@ import java.util.List;
 import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImageUtils;
 import it.unipi.ing.mim.deep.ImgDescriptor;
+import it.unipi.ing.mim.deep.Parameters;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -48,17 +49,19 @@ public class YoloGridView extends ScrollPane{
 	}
 	
 	public void refreshItems(List<ImgDescriptor> items) throws IOException {
-		HashMap<String, ArrayList<ImgDescriptor>> hmap = new HashMap<>();
-		for(ImgDescriptor d : items) {
-			if( hmap.get(d.getId()) == null ){
-				hmap.put(d.getId(), new ArrayList<ImgDescriptor>());
+		if( Parameters.USE_ACCURACY_FOR_CLASS_SCORE == true )
+			gallery.refreshItems(items);
+		else {
+			HashMap<String, ArrayList<ImgDescriptor>> hmap = new HashMap<>();
+			for(ImgDescriptor d : items) {
+				if( hmap.get(d.getId()) == null ){
+					hmap.put(d.getId(), new ArrayList<ImgDescriptor>());
+				}
+				ArrayList<ImgDescriptor> al = hmap.get(d.getId());
+				al.add(d);
 			}
-			ArrayList<ImgDescriptor> al = hmap.get(d.getId());
-			al.add(d);
+			gallery.refreshItems(hmap);
 		}
-		
-		//gallery.refreshItems(items);
-		gallery.refreshItems(hmap);
 	}
 	
 	private class MyGrid extends GridPane{
