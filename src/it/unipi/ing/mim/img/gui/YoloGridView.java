@@ -100,7 +100,7 @@ public class YoloGridView extends ScrollPane{
 				String details = String.valueOf(j+1) + ") CLASS: " + di.getClassByIndex(j) + "\t SCORE: " + di.getScoreByIndex(j) + "\n";
 				Text lab = new Text(details);
 				lab.setId(String.valueOf(j));
-				lab.setOnMouseMoved(ev->{
+				lab.setOnMouseEntered(ev->{
 					Text l = (Text) ev.getTarget(); 
 					int idT = Integer.parseInt(l.getId());
 					try {
@@ -110,6 +110,11 @@ public class YoloGridView extends ScrollPane{
 						e.printStackTrace();
 					}
 				}); 
+				
+				lab.setOnMouseExited(ev->{
+					tmp.setImage(imTemp);
+				});
+				//lab.setOnMouseExited(value);
 				bboxDetails.getChildren().add(lab);
 				
 			}
