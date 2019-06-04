@@ -249,9 +249,7 @@ public class YoloGUI extends Application {
 	}
 	
 	private List<ImgDescriptor> tagSearch(String tag, int k) {
-	
 		try {
-			
 			if(bothR.isSelected())
 				return eSearch.search(tag, k);
 			else if(tagR.isSelected())
@@ -260,7 +258,6 @@ public class YoloGUI extends Application {
 				return eSearch.searchByClass(tag, k);
 			else
 				return null;
-			
 		} catch (ClassNotFoundException e) {
 			showException(e);
 			return null;
@@ -271,7 +268,6 @@ public class YoloGUI extends Application {
 			showException(e);
 			return null;
 		}
-
 	}
 	
 	private List<ImgDescriptor> imageSearch(File image, int k) {
@@ -303,53 +299,34 @@ public class YoloGUI extends Application {
 	private class LoadGallery implements Runnable{
 		
 		public void run() {
-			
 			List<ImgDescriptor> searched = null;
-			
-			if(!humanTags.getText().equals("")) {
+		
+			if(!humanTags.getText().equals("")) {		
+				int k = it.unipi.ing.mim.deep.Parameters.K;
 				
-				if(!topK.getText().equals("")) {
-					
-					int k = it.unipi.ing.mim.deep.Parameters.K;
-					
-					try {
-						
-						k = Integer.parseInt(topK.getText());
-						if(k<=0)
-							k = it.unipi.ing.mim.deep.Parameters.K;
-						
-					}catch(NumberFormatException e) {
-						k = it.unipi.ing.mim.deep.Parameters.K;
-					}finally {
-						
-						topK.setText(String.valueOf(k));
-						searched = tagSearch(humanTags.getText(), k);
-						
-					}
-				}
-					
-				
+				try {
+					k = Integer.parseInt(topK.getText());
+					if(k<=0)
+						k = it.unipi.ing.mim.deep.Parameters.K;	
+				}catch(NumberFormatException e) {
+					System.out.println("K error");
+					k = it.unipi.ing.mim.deep.Parameters.K;
+				}finally {
+					topK.setText(String.valueOf(k));
+					searched = tagSearch(humanTags.getText(), k);
+				}	
 			}else if(img.getImage() != null) {
-				
-				if(!topK.getText().equals("")) {
-					
-					int k = it.unipi.ing.mim.deep.Parameters.K;
-					
-					try {
-						
-						k = Integer.parseInt(topK.getText());
-						if(k<=0)
-							k = it.unipi.ing.mim.deep.Parameters.K;
-						
-					}catch(NumberFormatException e) {
+				int k = it.unipi.ing.mim.deep.Parameters.K;
+				try {
+					k = Integer.parseInt(topK.getText());
+					if(k<=0)
 						k = it.unipi.ing.mim.deep.Parameters.K;
-					}finally {
-						
-						topK.setText(String.valueOf(k));
-						searched = imageSearch(openedImage, k);
-					}
-					
-				}
+				}catch(NumberFormatException e) {
+					k = it.unipi.ing.mim.deep.Parameters.K;
+				}finally {
+					topK.setText(String.valueOf(k));
+					searched = imageSearch(openedImage, k);
+				}	
 			}
 			
 			if(searched != null) {
