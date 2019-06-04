@@ -3,7 +3,6 @@ package it.unipi.ing.mim.img.elasticsearch;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.seq.SeqImageSearch;
-import it.unipi.ing.mim.deep.seq.SeqImageStorage;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
 
 import java.io.File;

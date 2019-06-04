@@ -10,15 +10,12 @@ import static org.bytedeco.opencv.global.opencv_highgui.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import static org.bytedeco.opencv.global.opencv_core.*;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.javacpp.indexer.IntBufferIndexer;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.MatVector;
 import org.bytedeco.opencv.opencv_core.Rect;
@@ -27,9 +24,6 @@ import org.bytedeco.opencv.opencv_core.Scalar;
 import org.bytedeco.opencv.opencv_core.Size;
 import org.bytedeco.opencv.opencv_core.StringVector;
 import org.bytedeco.opencv.opencv_dnn.*;
-import org.opencv.core.MatOfInt;
-
-import com.sun.org.apache.xml.internal.utils.IntVector;
 
 import javafx.util.Pair;
 
@@ -55,6 +49,7 @@ public class BBoxExtractor {
         String cocoLine = "";
         while((cocoLine=bufferedCocoReader.readLine())!=null)
         	cocoClasses.add(cocoLine);
+        bufferedCocoReader.close();
    }
 
 	public ArrayList<Pair<String,Rect>>  extract(File image) {

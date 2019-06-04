@@ -1,14 +1,9 @@
 package it.unipi.ing.mim.img.gui;
 
-import static org.bytedeco.opencv.global.opencv_imgproc.rectangle;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.opencv_core.Rect;
-import org.bytedeco.opencv.opencv_core.Scalar;
+
 
 import it.unipi.ing.mim.deep.DetailedImage;
 import it.unipi.ing.mim.deep.ImageUtils;
@@ -16,11 +11,9 @@ import it.unipi.ing.mim.deep.ImgDescriptor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

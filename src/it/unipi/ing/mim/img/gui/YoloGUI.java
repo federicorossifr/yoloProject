@@ -1,60 +1,34 @@
 package it.unipi.ing.mim.img.gui;
 
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
+import javafx.scene.*;
+import javafx.scene.layout.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import it.unipi.ing.mim.deep.DNNExtractor;
-import it.unipi.ing.mim.deep.ImageUtils;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-
-import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.img.elasticsearch.ElasticImgSearching;
-import it.unipi.ing.mim.img.elasticsearch.Pivots;
 
 public class YoloGUI extends Application {
 	
@@ -330,7 +304,7 @@ public class YoloGUI extends Application {
 			}
 			
 			if(searched != null) {		
-				final ArrayList<ImgDescriptor> imageTemp = new ArrayList(searched);
+				final ArrayList<ImgDescriptor> imageTemp = new ArrayList<>(searched);
 				
 				Platform.runLater(()->{
 					try {

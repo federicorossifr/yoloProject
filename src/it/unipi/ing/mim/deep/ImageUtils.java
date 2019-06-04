@@ -9,22 +9,12 @@ import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bytedeco.javacpp.indexer.ByteRawIndexer;
-import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.javacpp.indexer.UByteRawIndexer;
-import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.Scalar;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
-
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import static org.bytedeco.opencv.global.opencv_highgui.*;
 public class ImageUtils {
 	
 	/**
