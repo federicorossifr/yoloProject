@@ -113,7 +113,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		return res.subList(0, k);
 	}
 	/**
-	 * Search only by human tag
+	 * Search only by human tag on flickr tags
 	 * @param queryF
 	 * @param k
 	 * @return
@@ -128,7 +128,9 @@ public class ElasticImgSearching implements AutoCloseable {
 		k = k>resTag.size()?resTag.size():k;
 		return normalizeMax(resTag.subList(0, k));	
 	}
-	 
+	/**
+	 * Search only by tag on yolo classes extracted 
+	 */
 	public List<ImgDescriptor> searchByClass(String query,int k) throws ParseException, IOException, ClassNotFoundException{
 		SearchResponse searchResponse = getSearchResponse(query, k, Fields.YOLO_TAGS,Parameters.TAGS_INDEX_NAME);
 		List<ImgDescriptor> resClass =  performTextualSearch(searchResponse,TAGS_SEARCH_MODE.YOLO,query);
@@ -136,7 +138,11 @@ public class ElasticImgSearching implements AutoCloseable {
 		k = k>resClass.size()?resClass.size():k;
 		return normalizeMax(resClass.subList(0, k));
 	}	 
-	
+	/**
+	 * Gets query terms by filtering out spaces and conjunctions such as (,),AND,OR, AND NOT, OR NOT
+	 * @param query
+	 * @return
+	 */
 	private ArrayList<String> getQueryTerms(String query) {
 		// Replace parentheses and boolean operators with one space 
 		String queryTerms = query.replace("(", " ").replace(")", " ")
@@ -190,15 +196,13 @@ public class ElasticImgSearching implements AutoCloseable {
 			} else {
 				DetailedImage di = new DetailedImage(imageId);
 				ArrayList<String> classNames = di.getClassNames();
-				for(int i = 0; i < classNames.size();++i) {
-					if(queryMap.contains(classNames.get(i))) {
+				for(int i = 0; i < classNames.size();++i) { 
+					if(queryMap.contains(classNames.get(i))) { //for every class check if it is in the query (NOT already filtered a priori
 						ImgDescriptor imgDesc = new ImgDescriptor(null,imageId,i);
-						
 						float score = h.getScore();
-						if(this.useAccuracyClassScore)
+						if(this.useAccuracyClassScore) //use accuracy percentage given by Yolo
 							score *= di.getScoreByIndex(i);
 						imgDesc.setDist(score);
-
 						res.add(imgDesc);
 					}
 				}
@@ -228,10 +232,6 @@ public class ElasticImgSearching implements AutoCloseable {
 			im.setDist(im.getDist()/max);
 		return sorted;
 	}
-	
-
-	
-	
 	/**
 	 * Image search by class name and afterwards by tag, matches by tag are not added if already present
 	 * @param queryF
@@ -242,11 +242,11 @@ public class ElasticImgSearching implements AutoCloseable {
 	 * @throws ClassNotFoundException
 	 */
 	private List<ImgDescriptor> joinImgDescriptors( List<ImgDescriptor> resTag, List<ImgDescriptor> resClass){
-		HashSet<String> resClassSet = new HashSet<String>();
-		for (ImgDescriptor im: resClass)
+		HashSet<String> resClassSet = new HashSet<String>(); //used to have linear complexity
+		for (ImgDescriptor im: resClass)//O(n)
 			resClassSet.add(im.getId());
 
-		for (ImgDescriptor im: resTag)
+		for (ImgDescriptor im: resTag)//O(n)
 			if(!resClassSet.contains(im.getId()))
 				resClass.add(im);
 		return resClass;
@@ -271,7 +271,7 @@ public class ElasticImgSearching implements AutoCloseable {
 	}
 	
 	/**
-	 * Call composeSearch to get SearchRequest object and perform elasticsearch search
+	 * Call composeSearch to get SearchRequest object and perform elastic-search search
 	 * @param queryF
 	 * @param k
 	 * @param field
