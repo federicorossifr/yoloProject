@@ -74,6 +74,7 @@ public class YoloGridView extends ScrollPane{
 		
 		private int numCols;
 		private int imageSize;
+		private String fontLabel = "Comic Sans MS";
 		
 		public MyGrid(int nCols, int iSize, int childD) {
 			numCols = nCols;
@@ -92,7 +93,7 @@ public class YoloGridView extends ScrollPane{
 			DetailedImage di = new DetailedImage(id);
 			VBox bboxDetails = new VBox(5);
 			Label bboxTags = new Label("YOLO BOUNDING BOXES:");
-			bboxTags.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			bboxTags.setFont(Font.font(fontLabel, FontWeight.BOLD, 16));
 			bboxDetails.getChildren().add(bboxTags);
 			
 			for(int j = 0; j<di.getBoundingBoxes().size(); ++j) {
@@ -120,7 +121,7 @@ public class YoloGridView extends ScrollPane{
 			}
 			
 			Label tagsL = new Label("FLICKR TAGS:");
-			tagsL.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+			tagsL.setFont(Font.font(fontLabel, FontWeight.BOLD, 16));
 			Label t = new Label(di.serializeHumanTags());
 			t.setMaxWidth(imTemp.getWidth()-20);
 			t.setWrapText(true);
@@ -131,7 +132,7 @@ public class YoloGridView extends ScrollPane{
 			ScrollPane sp = new ScrollPane(bboxDetails);
 			sp.setPrefHeight(153);
 			Label det = new Label("DETAILS - Score " + score);
-			det.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+			det.setFont(Font.font(fontLabel, FontWeight.BOLD, 30));
 			VBox vb = new VBox(20,tmp, det,sp);
 			vb.setAlignment(Pos.CENTER);
 			s.setScene(new Scene(new Group(vb),imTemp.getWidth(),imTemp.getHeight()+230));

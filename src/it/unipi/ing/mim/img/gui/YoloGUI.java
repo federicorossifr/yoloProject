@@ -24,6 +24,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -47,6 +49,8 @@ public class YoloGUI extends Application {
 	private final int space = 20;
 	private final int wLoading = 30;
 	private final int hLoading = 30;
+	
+	private String labelFont = "Comic Sans MS";
 	
 	private float[] imgFeatures;
 	private File openedImage;
@@ -107,7 +111,9 @@ public class YoloGUI extends Application {
 		topK.setText(String.valueOf(it.unipi.ing.mim.deep.Parameters.K));
 		
 		Label tagLabel = new Label("Tag:");
+		tagLabel.setFont(Font.font(labelFont));
 		Label topKLabel = new Label("Top K-NN: ");
+		topKLabel.setFont(Font.font(labelFont));
 		HBox foobox = new HBox();
 		foobox.setPrefWidth(27);
 		HBox hboxTag = new HBox(space,new Label(""),tagLabel,foobox, humanTags);
@@ -117,6 +123,7 @@ public class YoloGUI extends Application {
 		HBox searchBox = new HBox(30, startSearch, loading);
 		searchBox.setAlignment(Pos.CENTER);
 		Label RadioL = new Label("Search in: ");
+		RadioL.setFont(Font.font(labelFont));
 		tagR = new RadioButton("Tags");
 		classR = new RadioButton("Yolo Classes");
 		bothR = new RadioButton("Both");
@@ -127,6 +134,7 @@ public class YoloGUI extends Application {
 		bothR.setToggleGroup(tg);
 		HBox radioboxBox = new HBox(space, new Label(""),RadioL, tagR, classR, bothR); 
 		Label checkBoxL = new Label("Use accuracy for class score: ");
+		checkBoxL.setFont(Font.font(labelFont));
 		HBox checkboxBox = new HBox(space, new Label(""),checkBoxL,useAccuracyC); 
 		
 		VBox inputBox = new VBox(space,radioboxBox,checkboxBox,hboxTag,topKBox);
