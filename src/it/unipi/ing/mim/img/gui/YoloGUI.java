@@ -327,7 +327,7 @@ public class YoloGUI extends Application {
 				
 				Platform.runLater(()->{
 					try {
-						imageResults.refreshItems(imageTemp, useAccuracyC.isSelected());
+						imageResults.refreshItems(imageTemp, useAccuracyC.isSelected() || img.getImage() != null);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
