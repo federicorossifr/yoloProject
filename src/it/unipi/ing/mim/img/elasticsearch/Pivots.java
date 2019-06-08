@@ -46,14 +46,11 @@ public class Pivots {
 		int nSelectedPivs = 0;
 		ArrayList<ImgDescriptor> candidateSet = new ArrayList<>();
 		ArrayList<ImgDescriptor> pivots = new ArrayList<>();
-		ListIterator<ImgDescriptor> it = ids.listIterator();
-		
-		double maxD = -1;
-		int idMax = -1;
 		
 		// Insert at most 3*m random object in the candidate set
 		Collections.shuffle(ids);
 		int ins=0;
+		ListIterator<ImgDescriptor> it = ids.listIterator();
 		while( ins<MMM && it.hasNext() ) {
 			ImgDescriptor d = it.next();
 			if( d.getBoundingBoxIndex() != -1 ) {
@@ -68,18 +65,25 @@ public class Pivots {
 		nSelectedPivs++;
 		
 		while( nSelectedPivs<nPivs && candidateSet.size()>0 ) {
-			for(ImgDescriptor p : pivots) {
-				for(int j=0; j<candidateSet.size(); j++) {
-					if( p.distance(candidateSet.get(j)) > maxD ) {
-						maxD = p.distance(candidateSet.get(j));
-						idMax = j;
-					}
+			double maxD = Double.NEGATIVE_INFINITY;
+			int idMax = -1;
+
+			for(int j=0; j<candidateSet.size(); j++) {
+				double minD = Double.POSITIVE_INFINITY;
+				for(ImgDescriptor p : pivots) {
+					double newdist = p.distance(candidateSet.get(j));
+					if( newdist < minD )
+						minD = newdist;	
+				}
+				
+				if(minD > maxD) {
+					maxD = minD;
+					idMax = j;
 				}
 			}
-			//System.out.println("pivots selected id="+idMax+" dist="+maxD);
+			System.out.println("pivots selected id="+idMax+" dist="+maxD);
 			pivots.add(candidateSet.get(idMax));
 			candidateSet.remove(idMax);
-			maxD=-1; idMax=-1;
 			nSelectedPivs++;
 		}
 		System.out.println("PIVOTS SELECTED");
