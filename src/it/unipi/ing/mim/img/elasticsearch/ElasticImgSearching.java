@@ -47,7 +47,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		StatusLogger.getLogger().setLevel(Level.OFF);		
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY,false)) {
 			//Image Query File
-			File imgQuery = new File(Parameters.SRC_FOLDER, "im10001.jpg");
+			File imgQuery = new File(Parameters.SRC_FOLDER, "im7.jpg");
 			
 			DNNExtractor extractor = new DNNExtractor();
 			
@@ -56,7 +56,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName());
 					
 			long time = -System.currentTimeMillis();
-			List<ImgDescriptor> res = imgSearch.searchByClass("(dog AND NOT person) OR (dog AND NOT person)",100);
+			List<ImgDescriptor> res = imgSearch.search(query,100);//searchByClass("(dog AND NOT person) OR (dog AND NOT person)",100);
 			time += System.currentTimeMillis();
 			System.out.println("Search time: " + time + " ms");
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
@@ -265,7 +265,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		//convert queryF to text
 		String f2t = pivots.features2Text(queryF, topKSearch);
 		SearchResponse searchResponse = getSearchResponse(f2t, k, Fields.BOUNDING_BOX_FEAT, Parameters.FEATURE_INDEX_NAME);
-		List<ImgDescriptor> res = reorder(queryF,performExampleSearch(searchResponse, false));
+		List<ImgDescriptor> res = reorder(queryF,performExampleSearch(searchResponse));
 		k = k>res.size()?res.size():k;
 		return res.subList(0, k);
 	}
@@ -289,7 +289,7 @@ public class ElasticImgSearching implements AutoCloseable {
      * @param tags
      * @return
      */
-	private List<ImgDescriptor> performExampleSearch(SearchResponse searchResponse, boolean flickrTags) throws IOException{
+	private List<ImgDescriptor> performExampleSearch(SearchResponse searchResponse) throws IOException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		for(int i = 0; i < hits.length; ++i) {
