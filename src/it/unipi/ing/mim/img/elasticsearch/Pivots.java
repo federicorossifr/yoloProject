@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 
 public class Pivots {
@@ -46,14 +47,11 @@ public class Pivots {
 		int nSelectedPivs = 0;
 		ArrayList<ImgDescriptor> candidateSet = new ArrayList<>();
 		ArrayList<ImgDescriptor> pivots = new ArrayList<>();
-		ListIterator<ImgDescriptor> it = ids.listIterator();
-		
-		double maxD = -1;
-		int idMax = -1;
 		
 		// Insert at most 3*m random object in the candidate set
-		Collections.shuffle(ids);
+		Collections.shuffle(ids, new Random(12));
 		int ins=0;
+		ListIterator<ImgDescriptor> it = ids.listIterator();
 		while( ins<MMM && it.hasNext() ) {
 			ImgDescriptor d = it.next();
 			if( d.getBoundingBoxIndex() != -1 ) {
@@ -62,26 +60,45 @@ public class Pivots {
 			}
 		}
 		
-		//first pivot is random
-		pivots.add(candidateSet.get(0));
-		candidateSet.remove(0);
-		nSelectedPivs++;
-		
-		while( nSelectedPivs<nPivs && candidateSet.size()>0 ) {
-			for(ImgDescriptor p : pivots) {
-				for(int j=0; j<candidateSet.size(); j++) {
-					if( p.distance(candidateSet.get(j)) > maxD ) {
-						maxD = p.distance(candidateSet.get(j));
-						idMax = j;
-					}
+		// build min vector
+		double[] minVector = new double[candidateSet.size()];
+		for(int i=0; i<minVector.length; i++)
+			minVector[i] = Double.POSITIVE_INFINITY;
+
+		// first pivot is random
+		ImgDescriptor currentPivot = candidateSet.get(0);
+		pivots.add(currentPivot);
+		//candidateSet.remove(0);
+
+		while(nSelectedPivs<nPivs && nSelectedPivs < candidateSet.size()) {
+			// 1) compute min over distances
+			for(int j=0; j<candidateSet.size(); j++) {
+				if(minVector[j] != Double.NaN) {
+					double newdist = currentPivot.distance(candidateSet.get(j));
+					if(newdist < minVector[j])
+						minVector[j] = newdist;
 				}
 			}
-			//System.out.println("pivots selected id="+idMax+" dist="+maxD);
-			pivots.add(candidateSet.get(idMax));
-			candidateSet.remove(idMax);
-			maxD=-1; idMax=-1;
+			
+			// 2) compute max over mins
+			double maxVal = Double.NEGATIVE_INFINITY;
+			int maxValIndex = -1;
+			for(int j=0; j<candidateSet.size(); j++)
+				if(minVector[j] != Double.NaN && minVector[j] > maxVal) {
+					maxVal = minVector[j];
+					maxValIndex = j;
+				}
+			
+			System.out.println(nSelectedPivs + ": pivots selected id=" + maxValIndex + " dist=" + minVector[maxValIndex]);
+
+			minVector[maxValIndex] = Double.NaN;
+			currentPivot = candidateSet.get(maxValIndex); 
+			pivots.add(currentPivot);
 			nSelectedPivs++;
 		}
+	
+
+		pivots.remove(0);
 		System.out.println("PIVOTS SELECTED");
 		return pivots;
 	}
