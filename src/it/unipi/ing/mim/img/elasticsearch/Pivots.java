@@ -26,8 +26,13 @@ public class Pivots {
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		List<ImgDescriptor> ids = FeaturesStorage.load(Parameters.STORAGE_FILE);
 		//List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
+		long time = -System.currentTimeMillis();
 		List<ImgDescriptor> pivs = Pivots.make3MPivots(ids, Parameters.NUM_PIVOTS);
-		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE);
+		time += System.currentTimeMillis();
+		System.out.println(time + " ms");
+		System.out.println("PIVOTS SELECTED");
+		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE);		
+		System.out.println("PIVOTS STORED");
 	}
 	
 	//TODO
@@ -60,18 +65,20 @@ public class Pivots {
 			}
 		}
 		
-		// build min vector
+		// This vector will cointain min distances between each point
+		// in the candidate set and selected pivots
 		double[] minVector = new double[candidateSet.size()];
 		for(int i=0; i<minVector.length; i++)
 			minVector[i] = Double.POSITIVE_INFINITY;
 
-		// first pivot is random
+		// Choose a random point as first pivot
 		ImgDescriptor currentPivot = candidateSet.get(0);
 		pivots.add(currentPivot);
 		//candidateSet.remove(0);
 
 		while(nSelectedPivs<nPivs && nSelectedPivs < candidateSet.size()) {
-			// 1) compute min over distances
+			// 1) update min distance between each point on the candidate set and pivots
+			// note that min can only decrease when a new point is selected as pivots 
 			for(int j=0; j<candidateSet.size(); j++) {
 				if(minVector[j] != Double.NaN) {
 					double newdist = currentPivot.distance(candidateSet.get(j));
@@ -81,6 +88,7 @@ public class Pivots {
 			}
 			
 			// 2) compute max over mins
+			// the point that has higher min distance is the furthest from pivots set
 			double maxVal = Double.NEGATIVE_INFINITY;
 			int maxValIndex = -1;
 			for(int j=0; j<candidateSet.size(); j++)
@@ -99,7 +107,6 @@ public class Pivots {
 	
 
 		pivots.remove(0);
-		System.out.println("PIVOTS SELECTED");
 		return pivots;
 	}
 	
