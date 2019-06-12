@@ -200,7 +200,7 @@ public class ElasticImgSearching implements AutoCloseable {
 					if(queryMap.contains(classNames.get(i))) { //for every class check if it is in the query (NOT already filtered a priori
 						ImgDescriptor imgDesc = new ImgDescriptor(null,imageId,i);
 						float score = h.getScore();
-						if(this.useAccuracyClassScore) //use accuracy percentage given by Yolo
+						if(mode == TAGS_SEARCH_MODE.YOLO && this.useAccuracyClassScore) //use accuracy percentage given by Yolo
 							score *= di.getScoreByIndex(i);
 						imgDesc.setDist(score);
 						res.add(imgDesc);
@@ -267,6 +267,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		SearchResponse searchResponse = getSearchResponse(f2t, k, Fields.BOUNDING_BOX_FEAT, Parameters.FEATURE_INDEX_NAME);
 		List<ImgDescriptor> res = reorder(queryF,performExampleSearch(searchResponse));
 		k = k>res.size()?res.size():k;
+		System.out.println("First score: "+res.get(0).getDist());
 		return res.subList(0, k);
 	}
 	
