@@ -1,7 +1,7 @@
 # yoloProject
 # Instructions
 <ul>
-  <li>Download the following dataset [dataset]( http://press.liacs.nl/mirflickr/)in <kbd> /data/img/</kbd>  </li>
+  <li>Download the following [dataset](http://press.liacs.nl/mirflickr/) in <kbd> /data/img/</kbd>  </li>
   <li>Execute SeqImgStorage.java </li>
   <li>Execute Pivots.java</li>
   <li>Execute ElasticImgIndexing.java </li>
